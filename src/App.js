@@ -35,7 +35,6 @@ export default function App() {
   const [quizTitle, setQuizTitle] = useState('');
   const [lbTab, setLbTab] = useState('xp');
 
-  // Save progress to localStorage whenever state changes
   useEffect(() => {
     saveProgress(st);
   }, [st]);
@@ -48,16 +47,20 @@ export default function App() {
     setSt((prev) => ({ ...prev, ...patch }));
   }
 
-  function checkBadges(newSt) {
-    let nb = null;
-    const updated = [...newSt.earnedBadges];
+  function checkBadges(currentSt) {
+    const updated = [...currentSt.earnedBadges];
     BADGES.forEach((b) => {
-      if (!updated.includes(b.id) && b.cond({ ...newSt, unlockedCount: getUnlockedCount(newSt.xp, LEVELS, CATS) })) {
+      if (
+        !updated.includes(b.id) &&
+        b.cond({
+          ...currentSt,
+          unlockedCount: getUnlockedCount(currentSt.xp, LEVELS, CATS),
+        })
+      ) {
         updated.push(b.id);
-        nb = b;
       }
     });
-    return { nb, earnedBadges: updated };
+    return { earnedBadges: updated };
   }
 
   function show(id) {
@@ -98,7 +101,11 @@ export default function App() {
     if (correct) {
       setScore((s) => s + 1);
       setSessionXP((s) => s + xpGained);
-      updateSt({ xp: st.xp + xpGained, fastAnswers: fast ? st.fastAnswers + 1 : st.fastAnswers });
+      setSt((prev) => ({
+        ...prev,
+        xp: prev.xp + xpGained,
+        fastAnswers: fast ? prev.fastAnswers + 1 : prev.fastAnswers,
+      }));
     } else {
       setMissedWords((prev) => [...prev, { word, def }]);
     }
@@ -115,19 +122,31 @@ export default function App() {
   function onQuizEnd() {
     const finalScore = score;
     const isChallenge = quizTitle.includes('challenge');
-    const newBestScore = st.bestScore === null || finalScore > st.bestScore ? finalScore : st.bestScore;
-    const newQuizzes = st.quizzes + 1;
-    const newPerfect = finalScore === questions.length ? st.perfectScores + 1 : st.perfectScores;
-    const newSt = {
-      ...st,
-      quizzes: newQuizzes,
-      bestScore: newBestScore,
-      perfectScores: newPerfect,
-      challengeDone: isChallenge ? true : st.challengeDone,
-    };
-    const { nb, earnedBadges } = checkBadges(newSt);
-    newSt.earnedBadges = earnedBadges;
-    setSt(newSt);
+
+    setSt((prev) => {
+      const newBestScore =
+        prev.bestScore === null || finalScore > prev.bestScore
+          ? finalScore
+          : prev.bestScore;
+      const newQuizzes = prev.quizzes + 1;
+      const newPerfect =
+        finalScore === questions.length
+          ? prev.perfectScores + 1
+          : prev.perfectScores;
+
+      const updatedSt = {
+        ...prev,
+        quizzes: newQuizzes,
+        bestScore: newBestScore,
+        perfectScores: newPerfect,
+        challengeDone: isChallenge ? true : prev.challengeDone,
+      };
+
+      const { earnedBadges } = checkBadges(updatedSt);
+      updatedSt.earnedBadges = earnedBadges;
+      return updatedSt;
+    });
+
     show('result');
   }
 
@@ -140,16 +159,34 @@ export default function App() {
   }
 
   const props = {
-    st, updateSt, show, speak,
-    CATS, LEVELS, BADGES, FAKE_PLAYERS,
-    lvl, wpc, unlockedCount,
-    currentCat, setCurrentCat,
-    questions, qIdx, score, sessionXP,
-    timerMode, missedWords, quizTitle,
-    onAnswer, onNextQ,
-    onSaveUsername, onSkipSave,
-    lbTab, setLbTab,
-    startQuiz, startChallenge,
+    st,
+    updateSt,
+    show,
+    speak,
+    CATS,
+    LEVELS,
+    BADGES,
+    FAKE_PLAYERS,
+    lvl,
+    wpc,
+    unlockedCount,
+    currentCat,
+    setCurrentCat,
+    questions,
+    qIdx,
+    score,
+    sessionXP,
+    timerMode,
+    missedWords,
+    quizTitle,
+    onAnswer,
+    onNextQ,
+    onSaveUsername,
+    onSkipSave,
+    lbTab,
+    setLbTab,
+    startQuiz,
+    startChallenge,
   };
 
   return (

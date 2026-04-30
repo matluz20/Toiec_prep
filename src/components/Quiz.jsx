@@ -16,9 +16,11 @@ export default function Quiz({
   const [isCorrect, setIsCorrect] = useState(null);
   const [timeLeft, setTimeLeft] = useState(15);
   const timerRef = useRef(null);
+  const answeredRef = useRef(false);
 
   const q = questions[qIdx];
 
+  // Reset state on new question
   useEffect(() => {
     setHintUsed(false);
     setHintVisible(false);
@@ -29,31 +31,37 @@ export default function Quiz({
     setWriteChecked(false);
     setIsCorrect(null);
     setTimeLeft(15);
+    answeredRef.current = false;
   }, [qIdx]);
 
+  // Timer
   useEffect(() => {
-    if (!timerMode || answered) return;
+    if (!timerMode) return;
+    clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setTimeLeft((t) => {
         if (t <= 1) {
           clearInterval(timerRef.current);
-          handleTimeOut();
           return 0;
         }
         return t - 1;
       });
     }, 1000);
     return () => clearInterval(timerRef.current);
-  }, [qIdx, timerMode, answered]);
+  }, [qIdx, timerMode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Handle timeout when timeLeft hits 0
+  useEffect(() => {
+    if (timeLeft === 0 && timerMode && !answeredRef.current && q) {
+      answeredRef.current = true;
+      setAnswered(true);
+      setIsCorrect(false);
+      onAnswer({ correct: false, xpGained: 0, word: q.word, def: q.correct, fast: false });
+    }
+  }, [timeLeft]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function stopTimer() {
     clearInterval(timerRef.current);
-  }
-
-  function handleTimeOut() {
-    setAnswered(true);
-    setIsCorrect(false);
-    onAnswer({ correct: false, xpGained: 0, word: q.word, def: q.correct, fast: false });
   }
 
   function handleHint() {
@@ -62,8 +70,9 @@ export default function Quiz({
   }
 
   function handleOpt(opt) {
-    if (answered) return;
+    if (answered || answeredRef.current) return;
     stopTimer();
+    answeredRef.current = true;
     const ok = opt === q.correct;
     const fast = timerMode && timeLeft > 10;
     const xp = ok ? (hintUsed ? 3 : fast ? 8 : 5) : 0;
@@ -74,7 +83,9 @@ export default function Quiz({
   }
 
   function handleFlashAnswer(knew) {
+    if (answeredRef.current) return;
     stopTimer();
+    answeredRef.current = true;
     const xp = knew ? (hintUsed ? 3 : 5) : 0;
     setAnswered(true);
     setIsCorrect(knew);
@@ -82,8 +93,9 @@ export default function Quiz({
   }
 
   function handleWrite() {
-    if (answered) return;
+    if (answered || answeredRef.current) return;
     stopTimer();
+    answeredRef.current = true;
     const ok = writeVal.trim().toLowerCase() === q.correct.toLowerCase();
     const xp = ok ? (hintUsed ? 3 : 5) : 0;
     setWriteChecked(true);
@@ -128,9 +140,9 @@ export default function Quiz({
             disabled={hintUsed || answered}
             onClick={handleHint}
           >
-            💡 Hint <span style={{ fontSize: 10, color: 'var(--color-text-tertiary)' }}>(-2 XP)</span>
+            💡 Hint <span style={{ fontSize: 10, color: '#bbb' }}>(-2 XP)</span>
           </button>
-          {hintVisible && <div className="hint-box show">💡 {q.hint}</div>}
+          {hintVisible && <div className="hint-box">💡 {q.hint}</div>}
         </div>
 
         {/* MCQ / Fill */}
@@ -155,14 +167,14 @@ export default function Quiz({
         {q.type === 'flash' && (
           <div>
             <div style={{ textAlign: 'center', padding: '.75rem 0 .5rem' }}>
-              <div style={{ fontSize: 30, fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: 8 }}>{q.word}</div>
+              <div style={{ fontSize: 30, fontWeight: 500, marginBottom: 8 }}>{q.word}</div>
               <button className="vi-spk" onClick={() => speak(q.word)}>🔊 Listen</button>
             </div>
             {!flashRevealed && !answered && (
               <button className="flash-reveal" onClick={() => setFlashRevealed(true)}>Reveal definition</button>
             )}
             {(flashRevealed || answered) && (
-              <div className="flash-def-box show">
+              <div className="flash-def-box">
                 <div className="flash-def-t">{q.correct}</div>
                 <div className="flash-dfr">{q.dfr}</div>
                 <div className="flash-ex-t">{q.ex}</div>
@@ -194,20 +206,20 @@ export default function Quiz({
 
         {/* Feedback */}
         {answered && (
-          <div className={`fb show ${isCorrect ? 'ok' : 'ko'}`}>
+          <div className={`fb ${isCorrect ? 'ok' : 'ko'}`}>
             {isCorrect
               ? <>✓ Correct! <span className="xpp">+{hintUsed ? 3 : timerMode && timeLeft > 10 ? 8 : 5} XP</span> — {q.ex}</>
-              : q.type === 'flash'
-                ? `Remember: "${q.correct}"`
-                : timeLeft === 0
-                  ? `⏱ Time's up! Answer: "${q.correct}"`
+              : timeLeft === 0
+                ? `⏱ Time's up! Answer: "${q.correct}"`
+                : q.type === 'flash'
+                  ? `Remember: "${q.correct}"`
                   : `✗ Answer: "${q.correct}" — ${q.ex}`
             }
           </div>
         )}
 
         {answered && (
-          <button className="nxt show" onClick={onNextQ}>
+          <button className="nxt" onClick={onNextQ}>
             {qIdx + 1 >= questions.length ? 'See results →' : 'Next question →'}
           </button>
         )}
