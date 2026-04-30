@@ -25,6 +25,15 @@ const INITIAL_STATE = {
 export default function App() {
   const [screen, setScreen] = useState('home');
   const [st, setSt] = useState(() => loadProgress() || INITIAL_STATE);
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('dark') === '1');
+
+  function toggleDark() {
+    setDarkMode((d) => {
+      const next = !d;
+      localStorage.setItem('dark', next ? '1' : '0');
+      return next;
+    });
+  }
   const [currentCat, setCurrentCat] = useState('');
   const [questions, setQuestions] = useState([]);
   const [qIdx, setQIdx] = useState(0);
@@ -187,10 +196,12 @@ export default function App() {
     setLbTab,
     startQuiz,
     startChallenge,
+    darkMode,
+    toggleDark,
   };
 
   return (
-    <div className="app">
+    <div className={`app${darkMode ? ' dark' : ''}`}>
       {screen === 'home' && <Home {...props} />}
       {screen === 'vocab' && <Vocab {...props} />}
       {screen === 'vocab-list' && <VocabList {...props} />}

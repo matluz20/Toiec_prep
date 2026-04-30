@@ -4,6 +4,7 @@ export default function Home({
   st, show, speak, CATS, LEVELS, BADGES,
   lvl, wpc, unlockedCount,
   startQuiz, startChallenge,
+  darkMode, toggleDark,
 }) {
   const [wodOpen, setWodOpen] = useState(false);
   const [wod, setWod] = useState(null);
@@ -28,6 +29,9 @@ export default function Home({
         <div className="top-right">
           <button className="lb-btn" onClick={() => show('leaderboard')}>🏆 Rankings</button>
           <div className="streak-pill">🔥 {st.streak}</div>
+          <button className="dark-toggle" onClick={toggleDark} title="Toggle dark mode">
+            {darkMode ? '☀️' : '🌙'}
+          </button>
         </div>
       </div>
 
