@@ -15,7 +15,7 @@ export default function Leaderboard({ show, st, lvl, lbTab, setLbTab, user, onSa
   useEffect(() => {
     loadLeaderboard();
     // Auto-refresh every 30 seconds
-    const interval = setInterval(loadLeaderboard, 5000);
+    const interval = setInterval(loadLeaderboard, 30000);
     return () => clearInterval(interval);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
