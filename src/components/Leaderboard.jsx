@@ -10,12 +10,22 @@ export default function Leaderboard({ show, st, lvl, lbTab, setLbTab, user, onSa
   const [editLoading, setEditLoading] = useState(false);
   const [editSuccess, setEditSuccess] = useState(false);
 
+  const [lastRefresh, setLastRefresh] = useState(null);
+
   useEffect(() => {
-    fetchLeaderboard().then((data) => {
-      setPlayers(data);
-      setLoading(false);
-    });
-  }, []);
+    loadLeaderboard();
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(loadLeaderboard, 5000);
+    return () => clearInterval(interval);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function loadLeaderboard() {
+    setLoading(true);
+    const data = await fetchLeaderboard();
+    setPlayers(data);
+    setLastRefresh(new Date());
+    setLoading(false);
+}
 
   const myId = user?.id;
   const myName = st.username || 'Anonymous';
@@ -79,9 +89,32 @@ export default function Leaderboard({ show, st, lvl, lbTab, setLbTab, user, onSa
         <button className="back" onClick={() => show('home')}>←</button>
         <div>
           <div className="ph-title">🏆 Rankings</div>
-          <div className="ph-sub">Real-time leaderboard</div>
+          <div className="ph-sub">
+            {lastRefresh
+              ? `Updated ${lastRefresh.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+              : 'Loading...'}
+          </div>
         </div>
       </div>
+
+      <div className="ph">
+  <button className="back" onClick={() => show('home')}>←</button>
+  <div style={{ flex: 1 }}>
+    <div className="ph-title">🏆 Rankings</div>
+    <div className="ph-sub">
+      {lastRefresh
+        ? `Updated ${lastRefresh.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+        : 'Loading...'}
+    </div>
+  </div>
+  <button
+    className="refresh-btn"
+    onClick={loadLeaderboard}
+    disabled={loading}
+  >
+    {loading ? '...' : '↺'}
+  </button>
+</div>
 
       <div className="lb-wrap">
         {/* My card */}
