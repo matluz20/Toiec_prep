@@ -57,6 +57,16 @@ export default function Result({
     setUsernameLoading(false);
   }
 
+  function handleShare() {
+  const text = `🎯 Je viens de scorer ${score}/${questions.length} sur TOEIC Prep !\n⚡ +${sessionXP} XP gagnés\n📚 Prépare ton TOEIC → ${window.location.origin}`;
+  if (navigator.share) {
+    navigator.share({ title: 'TOEIC Prep', text });
+  } else {
+    navigator.clipboard.writeText(text);
+    alert('Score copié ! Colle-le où tu veux 🎉');
+  }
+  }
+
   function handleUseFirstName() {
     const name = user?.user_metadata?.full_name?.split(' ')[0] || 'Player';
     onSaveUsername(name);
@@ -166,6 +176,9 @@ export default function Result({
 
         <div className="r-acts">
           <button onClick={() => startQuiz(false)}>Play again</button>
+          <button className="share-btn" onClick={handleShare}>
+            📤 Share
+          </button>
           <button className="primary" onClick={() => show('home')}>Home →</button>
         </div>
       </div>

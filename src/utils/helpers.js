@@ -87,3 +87,22 @@ export function loadProgress() {
     return null;
   }
 }
+
+export function updateStreak(st) {
+  const today = new Date().toDateString();
+  const lastQuiz = localStorage.getItem('toeic_last_quiz');
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+  if (lastQuiz === today) {
+    // Already played today — streak unchanged
+    return st.streak;
+  } else if (lastQuiz === yesterday) {
+    // Played yesterday — increment streak
+    localStorage.setItem('toeic_last_quiz', today);
+    return st.streak + 1;
+  } else {
+    // Missed a day — reset streak
+    localStorage.setItem('toeic_last_quiz', today);
+    return 1;
+  }
+}
