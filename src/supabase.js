@@ -5,12 +5,20 @@ const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+// Generate or retrieve a guest ID stored in localStorage
+export function getGuestId() {
+  let guestId = localStorage.getItem('toeic_guest_id');
+  if (!guestId) {
+    guestId = 'guest_' + Math.random().toString(36).substr(2, 12);
+    localStorage.setItem('toeic_guest_id', guestId);
+  }
+  return guestId;
+}
+
 export async function signInWithGoogle() {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: {
-      redirectTo: window.location.origin,
-    },
+    options: { redirectTo: window.location.origin },
   });
   if (error) console.error('Login error:', error);
 }
@@ -19,10 +27,25 @@ export async function signOut() {
   await supabase.auth.signOut();
 }
 
-export async function saveProgressToCloud(userId, progress) {
+// Save progress — works for both Google users and guests
+export async function saveProgressToCloud(userId, progress, isGuest = false) {
   const { error } = await supabase
     .from('progress')
-    .upsert({ user_id: userId, ...progress, updated_at: new Date() });
+    .upsert({
+      user_id: userId,
+      is_guest: isGuest,
+      display_name: progress.username || (isGuest ? 'Guest' : null),
+      xp: progress.xp,
+      streak: progress.streak,
+      quizzes: progress.quizzes,
+      best_score: progress.best_score,
+      earned_badges: progress.earned_badges,
+      username: progress.username,
+      challenge_done: progress.challenge_done,
+      perfect_scores: progress.perfect_scores,
+      fast_answers: progress.fast_answers,
+      updated_at: new Date(),
+    });
   if (error) console.error('Save error:', error);
 }
 
@@ -34,4 +57,15 @@ export async function loadProgressFromCloud(userId) {
     .single();
   if (error) return null;
   return data;
+}
+
+// Fetch top players for leaderboard (both guests and Google users)
+export async function fetchLeaderboard() {
+  const { data, error } = await supabase
+    .from('progress')
+    .select('user_id, display_name, username, xp, best_score, is_guest')
+    .order('xp', { ascending: false })
+    .limit(50);
+  if (error) { console.error('Leaderboard error:', error); return []; }
+  return data || [];
 }

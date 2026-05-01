@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { CATS, LEVELS, BADGES, FAKE_PLAYERS } from './data/words';
 import { getLvl, getWPC, getUnlockedCount, speak, buildPool, saveProgress, loadProgress } from './utils/helpers';
-import { supabase, signInWithGoogle, signOut, saveProgressToCloud, loadProgressFromCloud } from './supabase';
+import { supabase, signInWithGoogle, signOut, saveProgressToCloud, loadProgressFromCloud, getGuestId } from './supabase';
 import Home from './components/Home';
 import Vocab from './components/Vocab';
 import VocabList from './components/VocabList';
@@ -96,7 +96,7 @@ export default function App() {
                 challenge_done: local.challengeDone,
                 perfect_scores: local.perfectScores,
                 fast_answers: local.fastAnswers,
-              });
+              }, false);
               setSt({ ...local, username: local.username || session.user.user_metadata?.full_name, promptShown: true });
             }
           }
@@ -107,20 +107,26 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Save progress locally + to cloud (Google or guest)
   useEffect(() => {
     saveProgress(st);
+    const progressData = {
+      xp: st.xp,
+      streak: st.streak,
+      quizzes: st.quizzes,
+      best_score: st.bestScore,
+      earned_badges: st.earnedBadges,
+      username: st.username,
+      challenge_done: st.challengeDone,
+      perfect_scores: st.perfectScores,
+      fast_answers: st.fastAnswers,
+    };
     if (user) {
-      saveProgressToCloud(user.id, {
-        xp: st.xp,
-        streak: st.streak,
-        quizzes: st.quizzes,
-        best_score: st.bestScore,
-        earned_badges: st.earnedBadges,
-        username: st.username,
-        challenge_done: st.challengeDone,
-        perfect_scores: st.perfectScores,
-        fast_answers: st.fastAnswers,
-      });
+      // Google user
+      saveProgressToCloud(user.id, progressData, false);
+    } else if (st.promptShown) {
+      // Guest with a username — save to cloud with guest ID
+      saveProgressToCloud(getGuestId(), progressData, true);
     }
   }, [st, user]);
 
