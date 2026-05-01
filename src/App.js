@@ -202,6 +202,7 @@ export default function App() {
   function onQuizEnd() {
   const finalScore = score;
   const isChallenge = quizTitle.includes('challenge');
+  const isRevision = quizTitle.includes('Revision');
   const newStreak = updateStreak(st); // ← doit être ici, AVANT setSt
 
   if (missedWords.length > 0) {
