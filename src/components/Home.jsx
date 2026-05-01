@@ -100,12 +100,7 @@ export default function Home({
         <div className="stat-box"><div className="stat-num">{st.earnedBadges.length}</div><div className="stat-lbl">badges</div></div>
       </div>
 
-      {/* Cloud sync status */}
-      {user && (
-        <div className="sync-banner">
-          ☁️ Progress synced to your Google account
-        </div>
-      )}
+      
 
 
       {/* Modes */}
