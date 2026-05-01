@@ -170,10 +170,10 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(() => {
   return localStorage.getItem('toeic_dark') === 'true';
     });
-  useEffect(() => {
-    document.body.classList.toggle('dark', darkMode);
-    localStorage.setItem('toeic_dark', darkMode);
-  }, [darkMode]);
+useEffect(() => {
+  // Apply dark class to .app div instead of body
+  localStorage.setItem('toeic_dark', darkMode);
+}, [darkMode]);
 
 
 
@@ -395,7 +395,8 @@ function startReversedQuiz() {
     );
   }
   return (
-    <div className="app">
+    
+    <div className={`app${darkMode ? ' dark' : ''}`}>
       {screen === 'home' && <Home {...props} />}
       {screen === 'vocab' && <Vocab {...props} />}
       {screen === 'vocab-list' && <VocabList {...props} />}
