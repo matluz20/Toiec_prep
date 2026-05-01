@@ -209,6 +209,10 @@ export default function App() {
     localStorage.setItem('toeic_missed_words', JSON.stringify(uniq));
   }
 
+  if (isRevision) {
+    localStorage.removeItem('toeic_missed_words');
+  }
+
 
   setSt((prev) => {
     const newBestScore = prev.bestScore === null || finalScore > prev.bestScore ? finalScore : prev.bestScore;
