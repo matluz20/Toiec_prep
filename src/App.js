@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { CATS, LEVELS, BADGES, FAKE_PLAYERS } from './data/words';
 import { getLvl, getWPC, getUnlockedCount, speak, buildPool, saveProgress, loadProgress } from './utils/helpers';
+import { supabase, signInWithGoogle, signOut, saveProgressToCloud, loadProgressFromCloud } from './supabase';
 import Home from './components/Home';
 import Vocab from './components/Vocab';
 import VocabList from './components/VocabList';
@@ -25,15 +26,8 @@ const INITIAL_STATE = {
 export default function App() {
   const [screen, setScreen] = useState('home');
   const [st, setSt] = useState(() => loadProgress() || INITIAL_STATE);
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('dark') === '1');
-
-  function toggleDark() {
-    setDarkMode((d) => {
-      const next = !d;
-      localStorage.setItem('dark', next ? '1' : '0');
-      return next;
-    });
-  }
+  const [user, setUser] = useState(null);
+  const [loadingAuth, setLoadingAuth] = useState(true);
   const [currentCat, setCurrentCat] = useState('');
   const [questions, setQuestions] = useState([]);
   const [qIdx, setQIdx] = useState(0);
@@ -45,8 +39,90 @@ export default function App() {
   const [lbTab, setLbTab] = useState('xp');
 
   useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user || null);
+      if (session?.user) {
+        loadProgressFromCloud(session.user.id).then((data) => {
+          if (data) {
+            const cloudSt = {
+              xp: data.xp || 0,
+              streak: data.streak || 0,
+              quizzes: data.quizzes || 0,
+              bestScore: data.best_score || null,
+              earnedBadges: data.earned_badges || [],
+              username: data.username || session.user.user_metadata?.full_name || null,
+              promptShown: true,
+              challengeDone: data.challenge_done || false,
+              perfectScores: data.perfect_scores || 0,
+              fastAnswers: data.fast_answers || 0,
+            };
+            setSt(cloudSt);
+            saveProgress(cloudSt);
+          }
+        });
+      }
+      setLoadingAuth(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+      if (session?.user) {
+        loadProgressFromCloud(session.user.id).then((data) => {
+          if (data) {
+            const cloudSt = {
+              xp: data.xp || 0,
+              streak: data.streak || 0,
+              quizzes: data.quizzes || 0,
+              bestScore: data.best_score || null,
+              earnedBadges: data.earned_badges || [],
+              username: data.username || session.user.user_metadata?.full_name || null,
+              promptShown: true,
+              challengeDone: data.challenge_done || false,
+              perfectScores: data.perfect_scores || 0,
+              fastAnswers: data.fast_answers || 0,
+            };
+            setSt(cloudSt);
+            saveProgress(cloudSt);
+          } else {
+            const local = loadProgress();
+            if (local) {
+              saveProgressToCloud(session.user.id, {
+                xp: local.xp,
+                streak: local.streak,
+                quizzes: local.quizzes,
+                best_score: local.bestScore,
+                earned_badges: local.earnedBadges,
+                username: local.username || session.user.user_metadata?.full_name,
+                challenge_done: local.challengeDone,
+                perfect_scores: local.perfectScores,
+                fast_answers: local.fastAnswers,
+              });
+              setSt({ ...local, username: local.username || session.user.user_metadata?.full_name, promptShown: true });
+            }
+          }
+        });
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
     saveProgress(st);
-  }, [st]);
+    if (user) {
+      saveProgressToCloud(user.id, {
+        xp: st.xp,
+        streak: st.streak,
+        quizzes: st.quizzes,
+        best_score: st.bestScore,
+        earned_badges: st.earnedBadges,
+        username: st.username,
+        challenge_done: st.challengeDone,
+        perfect_scores: st.perfectScores,
+        fast_answers: st.fastAnswers,
+      });
+    }
+  }, [st, user]);
 
   const lvl = getLvl(st.xp, LEVELS);
   const wpc = getWPC(st.xp, LEVELS);
@@ -59,48 +135,31 @@ export default function App() {
   function checkBadges(currentSt) {
     const updated = [...currentSt.earnedBadges];
     BADGES.forEach((b) => {
-      if (
-        !updated.includes(b.id) &&
-        b.cond({
-          ...currentSt,
-          unlockedCount: getUnlockedCount(currentSt.xp, LEVELS, CATS),
-        })
-      ) {
+      if (!updated.includes(b.id) && b.cond({ ...currentSt, unlockedCount: getUnlockedCount(currentSt.xp, LEVELS, CATS) })) {
         updated.push(b.id);
       }
     });
     return { earnedBadges: updated };
   }
 
-  function show(id) {
-    setScreen(id);
-  }
+  function show(id) { setScreen(id); }
 
   function startQuiz(chrono) {
     const pool = buildPool(CATS, wpc);
     if (!pool.length) return;
     setQuestions(pool.slice(0, 10));
-    setQIdx(0);
-    setScore(0);
-    setSessionXP(0);
-    setMissedWords([]);
+    setQIdx(0); setScore(0); setSessionXP(0); setMissedWords([]);
     setTimerMode(!!chrono);
     setQuizTitle(chrono ? 'Speed mode ⏱️' : 'Mixed quiz ⚡');
     show('quiz');
   }
 
   function startChallenge() {
-    if (st.challengeDone) {
-      alert('Daily challenge already done! Come back tomorrow 💪');
-      return;
-    }
+    if (st.challengeDone) { alert('Daily challenge already done! Come back tomorrow 💪'); return; }
     const pool = buildPool(CATS, wpc);
     if (!pool.length) return;
     setQuestions(pool.slice(0, 5));
-    setQIdx(0);
-    setScore(0);
-    setSessionXP(0);
-    setMissedWords([]);
+    setQIdx(0); setScore(0); setSessionXP(0); setMissedWords([]);
     setTimerMode(false);
     setQuizTitle('Daily challenge 💪');
     show('quiz');
@@ -110,98 +169,65 @@ export default function App() {
     if (correct) {
       setScore((s) => s + 1);
       setSessionXP((s) => s + xpGained);
-      setSt((prev) => ({
-        ...prev,
-        xp: prev.xp + xpGained,
-        fastAnswers: fast ? prev.fastAnswers + 1 : prev.fastAnswers,
-      }));
+      setSt((prev) => ({ ...prev, xp: prev.xp + xpGained, fastAnswers: fast ? prev.fastAnswers + 1 : prev.fastAnswers }));
     } else {
       setMissedWords((prev) => [...prev, { word, def }]);
     }
   }
 
   function onNextQ() {
-    if (qIdx + 1 >= questions.length) {
-      onQuizEnd();
-    } else {
-      setQIdx((i) => i + 1);
-    }
+    if (qIdx + 1 >= questions.length) onQuizEnd();
+    else setQIdx((i) => i + 1);
   }
 
   function onQuizEnd() {
     const finalScore = score;
     const isChallenge = quizTitle.includes('challenge');
-
     setSt((prev) => {
-      const newBestScore =
-        prev.bestScore === null || finalScore > prev.bestScore
-          ? finalScore
-          : prev.bestScore;
-      const newQuizzes = prev.quizzes + 1;
-      const newPerfect =
-        finalScore === questions.length
-          ? prev.perfectScores + 1
-          : prev.perfectScores;
-
+      const newBestScore = prev.bestScore === null || finalScore > prev.bestScore ? finalScore : prev.bestScore;
       const updatedSt = {
         ...prev,
-        quizzes: newQuizzes,
+        quizzes: prev.quizzes + 1,
         bestScore: newBestScore,
-        perfectScores: newPerfect,
+        perfectScores: finalScore === questions.length ? prev.perfectScores + 1 : prev.perfectScores,
         challengeDone: isChallenge ? true : prev.challengeDone,
       };
-
       const { earnedBadges } = checkBadges(updatedSt);
       updatedSt.earnedBadges = earnedBadges;
       return updatedSt;
     });
-
     show('result');
   }
 
-  function onSaveUsername(name) {
-    updateSt({ username: name, promptShown: true });
-  }
+  function onSaveUsername(name) { updateSt({ username: name, promptShown: true }); }
+  function onSkipSave() { updateSt({ promptShown: true }); }
+  async function handleGoogleLogin() { await signInWithGoogle(); }
+  async function handleSignOut() { await signOut(); setUser(null); }
 
-  function onSkipSave() {
-    updateSt({ promptShown: true });
+  if (loadingAuth) {
+    return (
+      <div className="app loading-screen">
+        <div className="loading-dot" />
+      </div>
+    );
   }
 
   const props = {
-    st,
-    updateSt,
-    show,
-    speak,
-    CATS,
-    LEVELS,
-    BADGES,
-    FAKE_PLAYERS,
-    lvl,
-    wpc,
-    unlockedCount,
-    currentCat,
-    setCurrentCat,
-    questions,
-    qIdx,
-    score,
-    sessionXP,
-    timerMode,
-    missedWords,
-    quizTitle,
-    onAnswer,
-    onNextQ,
-    onSaveUsername,
-    onSkipSave,
-    lbTab,
-    setLbTab,
-    startQuiz,
-    startChallenge,
-    darkMode,
-    toggleDark,
+    st, updateSt, show, speak,
+    CATS, LEVELS, BADGES, FAKE_PLAYERS,
+    lvl, wpc, unlockedCount,
+    currentCat, setCurrentCat,
+    questions, qIdx, score, sessionXP,
+    timerMode, missedWords, quizTitle,
+    onAnswer, onNextQ,
+    onSaveUsername, onSkipSave,
+    lbTab, setLbTab,
+    startQuiz, startChallenge,
+    user, handleGoogleLogin, handleSignOut,
   };
 
   return (
-    <div className={`app${darkMode ? ' dark' : ''}`}>
+    <div className="app">
       {screen === 'home' && <Home {...props} />}
       {screen === 'vocab' && <Vocab {...props} />}
       {screen === 'vocab-list' && <VocabList {...props} />}
