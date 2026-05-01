@@ -30,7 +30,7 @@ function stateFromCloud(data, fallbackName) {
     quizzes: data.quizzes || 0,
     bestScore: data.best_score || null,
     earnedBadges: data.earned_badges || [],
-    username: data.username || fallbackName || null,
+    username: data.username || null,
     promptShown: true,
     challengeDone: data.challenge_done || false,
     perfectScores: data.perfect_scores || 0,
@@ -91,21 +91,21 @@ export default function App() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function syncFromCloud(googleUser) {
-    const data = await loadProgressFromCloud(googleUser.id);
-    if (data) {
-      // Cloud data exists — load it
-      const cloudSt = stateFromCloud(data, googleUser.user_metadata?.full_name);
-      setSt(cloudSt);
-      saveProgress(cloudSt);
-    } else {
-      // First time login — push local progress to cloud
-      const local = loadProgress() || INITIAL_STATE;
-      const merged = { ...local, promptShown: true };
-      setSt(merged);
-      saveProgress(merged);
-      await saveProgressToCloud(googleUser.id, stateToCloud(merged), false);
-    }
+  const data = await loadProgressFromCloud(googleUser.id);
+  if (data) {
+    // Load cloud data — keep username from cloud, NOT from Google profile
+    const cloudSt = stateFromCloud(data, null);
+    setSt(cloudSt);
+    saveProgress(cloudSt);
+  } else {
+    // First time — push local progress but clear username so picker shows
+    const local = loadProgress() || INITIAL_STATE;
+    const merged = { ...local, username: null, promptShown: true };
+    setSt(merged);
+    saveProgress(merged);
+    await saveProgressToCloud(googleUser.id, stateToCloud(merged), false);
   }
+}
 
   // Auto-save to cloud whenever state changes
   useEffect(() => {
