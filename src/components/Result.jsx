@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { checkUsernameAvailable, updateUsername } from '../supabase';
+import { checkUsernameAvailable } from '../supabase';
 
 const GoogleIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" style={{ marginRight: 8, flexShrink: 0 }}>
