@@ -85,19 +85,8 @@ export default function Leaderboard({ show, st, lvl, lbTab, setLbTab, user, onSa
 
   return (
     <div>
-      <div className="ph">
-        <button className="back" onClick={() => show('home')}>←</button>
-        <div>
-          <div className="ph-title">🏆 Rankings</div>
-          <div className="ph-sub">
-            {lastRefresh
-              ? `Updated ${lastRefresh.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-              : 'Loading...'}
-          </div>
-        </div>
-      </div>
 
-      <div className="ph">
+  <div className="ph">
   <button className="back" onClick={() => show('home')}>←</button>
   <div style={{ flex: 1 }}>
     <div className="ph-title">🏆 Rankings</div>
