@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 export default function Home({
   st, show, speak, CATS, LEVELS, BADGES,
   lvl, wpc, unlockedCount,
-  startQuiz, startChallenge,
+  startQuiz, startChallenge,startRevision,
   user, handleGoogleLogin, handleSignOut,
 }) {
   const [wodOpen, setWodOpen] = useState(false);
@@ -97,6 +97,7 @@ export default function Home({
         </div>
       )}
 
+
       {/* Modes */}
       <div className="sec-title">Training modes</div>
       <div className="mode-grid">
@@ -125,6 +126,17 @@ export default function Home({
             {st.challengeDone ? '✓ done' : 'available'}
           </div>
         </div>
+
+        <div className="mode-card" onClick={startRevision}>
+        <div className="mode-ic ic-purple">📖</div>
+        <div className="mode-lbl">Révision</div>
+        <div className="mode-desc">Revoir les mots ratés</div>
+        <div className="mbadge mb-purple">
+          {typeof window !== 'undefined' && JSON.parse(localStorage.getItem('toeic_missed_words') || '[]').length > 0
+            ? `${JSON.parse(localStorage.getItem('toeic_missed_words')).length} mots à revoir`
+            : 'Aucun mot pour l\'instant'}
+        </div>
+      </div>
       </div>
 
       {/* Badges */}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { CATS, LEVELS, BADGES } from './data/words';
-import { getLvl, getWPC, getUnlockedCount, speak, buildPool, saveProgress, loadProgress,updateStreak } from './utils/helpers';
+import { getLvl, getWPC, getUnlockedCount, speak, buildPool, buildRevisionPool, saveProgress, loadProgress,updateStreak } from './utils/helpers';
 import { supabase, signInWithGoogle, signOut, saveProgressToCloud, loadProgressFromCloud } from './supabase';
 import Home from './components/Home';
 import Vocab from './components/Vocab';
@@ -167,6 +167,19 @@ export default function App() {
     show('quiz');
   }
 
+  function startRevision() {
+  const pool = buildRevisionPool(CATS);
+  if (!pool.length) {
+    alert('No words to review yet! Complete a quiz first. 💪');
+    return;
+  }
+  setQuestions(pool.slice(0, Math.min(pool.length, 10)));
+  setQIdx(0); setScore(0); setSessionXP(0); setMissedWords([]);
+  setTimerMode(false);
+  setQuizTitle('Revision mode 📖');
+  show('quiz');
+}
+
   function onAnswer({ correct, xpGained, word, def, fast }) {
     if (correct) {
       setScore((s) => s + 1);
@@ -190,6 +203,12 @@ export default function App() {
   const finalScore = score;
   const isChallenge = quizTitle.includes('challenge');
   const newStreak = updateStreak(st); // ← doit être ici, AVANT setSt
+
+  if (missedWords.length > 0) {
+    const uniq = missedWords.filter((v, i, a) => a.findIndex((x) => x.word === v.word) === i);
+    localStorage.setItem('toeic_missed_words', JSON.stringify(uniq));
+  }
+
 
   setSt((prev) => {
     const newBestScore = prev.bestScore === null || finalScore > prev.bestScore ? finalScore : prev.bestScore;
@@ -250,7 +269,7 @@ export default function App() {
     onSaveUsername, onSkipSave,
     lbTab, setLbTab,
     startQuiz, startChallenge,
-    user, handleGoogleLogin, handleSignOut,
+    user, handleGoogleLogin, handleSignOut, startRevision,
   };
 
     if (showSplash) {
@@ -295,38 +314,44 @@ export default function App() {
 
       {/* Bottom navbar — hidden during quiz */}
     {screen !== 'quiz' && (
-      <nav className="bottom-nav">
-        <button
-          className={`nav-item${screen === 'home' ? ' active' : ''}`}
-          onClick={() => show('home')}
-        >
-          <span className="nav-icon">🏠</span>
-          <span className="nav-label">Home</span>
-        </button>
-        <button
-          className={`nav-item${screen === 'vocab' || screen === 'vocab-list' ? ' active' : ''}`}
-          onClick={() => show('vocab')}
-        >
-          <span className="nav-icon">📚</span>
-          <span className="nav-label">Vocab</span>
-        </button>
-        <button
-          className="nav-item nav-quiz-btn"
-          onClick={() => startQuiz(false)}
-        >
-          <span className="nav-icon">⚡</span>
-          <span className="nav-label">Quiz</span>
-        </button>
-        <button
-          className={`nav-item${screen === 'leaderboard' ? ' active' : ''}`}
-          onClick={() => show('leaderboard')}
-        >
-          <span className="nav-icon">🏆</span>
-          <span className="nav-label">Rankings</span>
-        </button>
-      
-      </nav>
-    )}
+  <nav className="bottom-nav">
+    <button
+      className={`nav-item${screen === 'home' ? ' active' : ''}`}
+      onClick={() => show('home')}
+    >
+      <span className="nav-icon">🏠</span>
+      <span className="nav-label">Home</span>
+    </button>
+    <button
+      className={`nav-item${screen === 'vocab' || screen === 'vocab-list' ? ' active' : ''}`}
+      onClick={() => show('vocab')}
+    >
+      <span className="nav-icon">📚</span>
+      <span className="nav-label">Vocab</span>
+    </button>
+    <button
+      className="nav-item nav-quiz-btn"
+      onClick={() => startQuiz(false)}
+    >
+      <span className="nav-icon">⚡</span>
+      <span className="nav-label">Quiz</span>
+    </button>
+    <button
+      className="nav-item"
+      onClick={startRevision}
+    >
+      <span className="nav-icon">📖</span>
+      <span className="nav-label">Révision</span>
+    </button>
+    <button
+      className={`nav-item${screen === 'leaderboard' ? ' active' : ''}`}
+      onClick={() => show('leaderboard')}
+    >
+      <span className="nav-icon">🏆</span>
+      <span className="nav-label">Rankings</span>
+    </button>
+  </nav>
+)}
       
     </div>
   );

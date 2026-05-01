@@ -607,6 +607,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 /* Add padding to app content so navbar doesn't overlap */
 .app { padding-bottom: 70px; }
 
+.ic-purple { background: #EEEDFE; }
+.mb-purple { color: #5B50D6; background: #EEEDFE; }
+
 /* SHARE BUTTON */
 .share-btn {
   flex: 1;

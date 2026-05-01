@@ -106,3 +106,44 @@ export function updateStreak(st) {
     return 1;
   }
 }
+
+
+export function buildRevisionPool(CATS) {
+  try {
+    const missed = JSON.parse(localStorage.getItem('toeic_missed_words') || '[]');
+    if (!missed.length) return [];
+    const allWords = Object.values(CATS).flatMap((c) => c.words);
+    const allDefs = allWords.map((w) => w.d);
+    const allWordsList = allWords.map((w) => w.w);
+    const pool = [];
+    missed.forEach((item) => {
+      const fullWord = allWords.find((w) => w.w === item.word);
+      if (!fullWord) return;
+      const wrongDefs = allDefs.filter((d) => d !== fullWord.d).sort(() => Math.random() - 0.5).slice(0, 3);
+      const wrongWords = allWordsList.filter((w) => w !== fullWord.w).sort(() => Math.random() - 0.5).slice(0, 3);
+      pool.push({
+        word: fullWord.w, type: 'mcq',
+        q: `What does "${fullWord.w}" mean?`,
+        opts: [...wrongDefs, fullWord.d].sort(() => Math.random() - 0.5),
+        correct: fullWord.d, ex: fullWord.e,
+        hint: `Type: ${fullWord.t} — starts with "${fullWord.w[0].toUpperCase()}" (${fullWord.w.length} letters)`,
+        dfr: fullWord.dfr,
+      });
+      pool.push({
+        word: fullWord.w, type: 'flash',
+        q: 'Do you know this word?',
+        correct: fullWord.d, ex: fullWord.e, dfr: fullWord.dfr,
+        hint: `Type: ${fullWord.t} — ${fullWord.dfr}`,
+      });
+      pool.push({
+        word: fullWord.w, type: 'write',
+        q: `Write the English word that means:\n"${fullWord.dfr}"`,
+        correct: fullWord.w, ex: fullWord.e,
+        hint: `Starts with "${fullWord.w[0].toUpperCase()}" — ${fullWord.w.length} letters`,
+      });
+    });
+    return pool.sort(() => Math.random() - 0.5);
+  } catch {
+    return [];
+  }
+}
