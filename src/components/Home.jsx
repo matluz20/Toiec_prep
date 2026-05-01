@@ -30,7 +30,7 @@ export default function Home({
           {user ? (
             <div className="user-pill">
               <img src={user.user_metadata?.avatar_url} alt="avatar" className="user-avatar" />
-              <span className="user-name">{user.user_metadata?.full_name?.split(' ')[0]}</span>
+              <span className="user-name">{st.username || user.user_metadata?.full_name?.split(' ')[0]}</span>
               <button className="signout-btn" onClick={handleSignOut}>✕</button>
             </div>
           ) : (

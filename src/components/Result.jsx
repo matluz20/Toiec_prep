@@ -49,8 +49,6 @@ export default function Result({
     <div className="save-prompt-title">Save your progress!</div>
     <div className="save-prompt-sub">
       You earned <strong>+{sessionXP} XP</strong> — don't lose it!
-      Sign in with Google to save your progress on all your devices
-      and appear on the leaderboard.
     </div>
     <button className="google-btn-full" onClick={handleGoogleLogin}>
       <svg width="16" height="16" viewBox="0 0 24 24" style={{ marginRight: 8 }}>
@@ -61,11 +59,11 @@ export default function Result({
       </svg>
       Continue with Google
     </button>
-    <div className="save-prompt-or">or</div>
+    <div className="save-prompt-or">or play as guest</div>
     <div className="save-prompt-guest">
       <input
         className="save-input"
-        placeholder="Play as guest (username)..."
+        placeholder="Choose a username..."
         maxLength={20}
         value={inputVal}
         onChange={(e) => setInputVal(e.target.value)}
@@ -75,6 +73,34 @@ export default function Result({
     </div>
     <div style={{ textAlign: 'center', marginTop: 8 }}>
       <span className="save-skip" onClick={onSkipSave}>Skip for now</span>
+    </div>
+  </div>
+)}
+
+{/* Username picker after Google login */}
+{user && !st.username && (
+  <div className="save-prompt">
+    <div className="save-prompt-icon">✏️</div>
+    <div className="save-prompt-title">Choose your username</div>
+    <div className="save-prompt-sub">
+      This is what others will see on the leaderboard — not your real name.
+    </div>
+    <div className="save-prompt-guest">
+      <input
+        className="save-input"
+        placeholder="e.g. TOEICmaster95..."
+        maxLength={20}
+        value={inputVal}
+        onChange={(e) => setInputVal(e.target.value)}
+        onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); }}
+      />
+      <button className="save-go" onClick={handleSave}>Save →</button>
+    </div>
+    <div style={{ textAlign: 'center', marginTop: 8 }}>
+      <span className="save-skip" onClick={() => {
+        const name = user.user_metadata?.full_name?.split(' ')[0] || 'Player';
+        onSaveUsername(name);
+      }}>Use my first name instead</span>
     </div>
   </div>
 )}
