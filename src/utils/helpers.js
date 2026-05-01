@@ -114,7 +114,6 @@ export function buildRevisionPool(CATS) {
     if (!missed.length) return [];
     const allWords = Object.values(CATS).flatMap((c) => c.words);
     const allDefs = allWords.map((w) => w.d);
-    const allWordsList = allWords.map((w) => w.w);
     const pool = [];
     missed.forEach((item) => {
       const fullWord = allWords.find((w) => w.w === item.word);
