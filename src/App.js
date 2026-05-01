@@ -208,7 +208,15 @@ export default function App() {
   function onSaveUsername(name) { updateSt({ username: name, promptShown: true }); }
   function onSkipSave() { updateSt({ promptShown: true }); }
   async function handleGoogleLogin() { await signInWithGoogle(); }
-  async function handleSignOut() { await signOut(); setUser(null); }
+  async function handleSignOut() {
+  await signOut();
+  // Clear all local data
+  localStorage.removeItem('toeic_progress');
+  localStorage.removeItem('toeic_guest_id');
+  setUser(null);
+  setSt(INITIAL_STATE);
+  setScreen('home');
+}
 
   if (loadingAuth) {
     return (
