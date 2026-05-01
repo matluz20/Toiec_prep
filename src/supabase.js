@@ -18,7 +18,12 @@ export function getGuestId() {
 export async function signInWithGoogle() {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.origin },
+    options: {
+      redirectTo: window.location.origin,
+      queryParams: {
+        prompt: 'select_account', // Force Google to show account picker
+      },
+    },
   });
   if (error) console.error('Login error:', error);
 }
