@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import { CATS, LEVELS, BADGES, FAKE_PLAYERS } from './data/words';
+import { CATS, LEVELS, BADGES } from './data/words';
 import { getLvl, getWPC, getUnlockedCount, speak, buildPool, saveProgress, loadProgress } from './utils/helpers';
 import { supabase, signInWithGoogle, signOut, saveProgressToCloud, loadProgressFromCloud, getGuestId } from './supabase';
 import Home from './components/Home';
@@ -23,6 +23,35 @@ const INITIAL_STATE = {
   fastAnswers: 0,
 };
 
+function stateFromCloud(data, fallbackName) {
+  return {
+    xp: data.xp || 0,
+    streak: data.streak || 0,
+    quizzes: data.quizzes || 0,
+    bestScore: data.best_score || null,
+    earnedBadges: data.earned_badges || [],
+    username: data.username || fallbackName || null,
+    promptShown: true,
+    challengeDone: data.challenge_done || false,
+    perfectScores: data.perfect_scores || 0,
+    fastAnswers: data.fast_answers || 0,
+  };
+}
+
+function stateToCloud(st) {
+  return {
+    xp: st.xp,
+    streak: st.streak,
+    quizzes: st.quizzes,
+    best_score: st.bestScore,
+    earned_badges: st.earnedBadges,
+    username: st.username,
+    challenge_done: st.challengeDone,
+    perfect_scores: st.perfectScores,
+    fast_answers: st.fastAnswers,
+  };
+}
+
 export default function App() {
   const [screen, setScreen] = useState('home');
   const [st, setSt] = useState(() => loadProgress() || INITIAL_STATE);
@@ -37,98 +66,63 @@ export default function App() {
   const [missedWords, setMissedWords] = useState([]);
   const [quizTitle, setQuizTitle] = useState('');
   const [lbTab, setLbTab] = useState('xp');
+  const [savingCloud, setSavingCloud] = useState(false);
 
+  // Load session on mount
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user || null);
       if (session?.user) {
-        loadProgressFromCloud(session.user.id).then((data) => {
-          if (data) {
-            const cloudSt = {
-              xp: data.xp || 0,
-              streak: data.streak || 0,
-              quizzes: data.quizzes || 0,
-              bestScore: data.best_score || null,
-              earnedBadges: data.earned_badges || [],
-              username: data.username || session.user.user_metadata?.full_name || null,
-              promptShown: true,
-              challengeDone: data.challenge_done || false,
-              perfectScores: data.perfect_scores || 0,
-              fastAnswers: data.fast_answers || 0,
-            };
-            setSt(cloudSt);
-            saveProgress(cloudSt);
-          }
-        });
+        setUser(session.user);
+        syncFromCloud(session.user);
       }
       setLoadingAuth(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
       if (session?.user) {
-        loadProgressFromCloud(session.user.id).then((data) => {
-          if (data) {
-            const cloudSt = {
-              xp: data.xp || 0,
-              streak: data.streak || 0,
-              quizzes: data.quizzes || 0,
-              bestScore: data.best_score || null,
-              earnedBadges: data.earned_badges || [],
-              username: data.username || session.user.user_metadata?.full_name || null,
-              promptShown: true,
-              challengeDone: data.challenge_done || false,
-              perfectScores: data.perfect_scores || 0,
-              fastAnswers: data.fast_answers || 0,
-            };
-            setSt(cloudSt);
-            saveProgress(cloudSt);
-          } else {
-            const local = loadProgress();
-            if (local) {
-              saveProgressToCloud(session.user.id, {
-                xp: local.xp,
-                streak: local.streak,
-                quizzes: local.quizzes,
-                best_score: local.bestScore,
-                earned_badges: local.earnedBadges,
-                username: local.username || session.user.user_metadata?.full_name,
-                challenge_done: local.challengeDone,
-                perfect_scores: local.perfectScores,
-                fast_answers: local.fastAnswers,
-              }, false);
-              setSt({ ...local, username: local.username || session.user.user_metadata?.full_name, promptShown: true });
-            }
-          }
-        });
+        setUser(session.user);
+        syncFromCloud(session.user);
+      } else {
+        setUser(null);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Save progress locally + to cloud (Google or guest)
+  async function syncFromCloud(googleUser) {
+    const data = await loadProgressFromCloud(googleUser.id);
+    if (data) {
+      // Cloud data exists — load it
+      const cloudSt = stateFromCloud(data, googleUser.user_metadata?.full_name);
+      setSt(cloudSt);
+      saveProgress(cloudSt);
+    } else {
+      // First time login — push local progress to cloud
+      const local = loadProgress() || INITIAL_STATE;
+      const merged = { ...local, promptShown: true };
+      setSt(merged);
+      saveProgress(merged);
+      await saveProgressToCloud(googleUser.id, stateToCloud(merged), false);
+    }
+  }
+
+  // Auto-save to cloud whenever state changes
   useEffect(() => {
     saveProgress(st);
-    const progressData = {
-      xp: st.xp,
-      streak: st.streak,
-      quizzes: st.quizzes,
-      best_score: st.bestScore,
-      earned_badges: st.earnedBadges,
-      username: st.username,
-      challenge_done: st.challengeDone,
-      perfect_scores: st.perfectScores,
-      fast_answers: st.fastAnswers,
-    };
-    if (user) {
-      // Google user
-      saveProgressToCloud(user.id, progressData, false);
-    } else if (st.promptShown) {
-      // Guest with a username — save to cloud with guest ID
-      saveProgressToCloud(getGuestId(), progressData, true);
+    if (!savingCloud) {
+      setSavingCloud(true);
+      const timeout = setTimeout(async () => {
+        if (user) {
+          await saveProgressToCloud(user.id, stateToCloud(st), false);
+        } else if (st.promptShown && st.username) {
+          await saveProgressToCloud(getGuestId(), stateToCloud(st), true);
+        }
+        setSavingCloud(false);
+      }, 1000); // debounce 1s
+      return () => clearTimeout(timeout);
     }
-  }, [st, user]);
+  }, [st]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const lvl = getLvl(st.xp, LEVELS);
   const wpc = getWPC(st.xp, LEVELS);
@@ -205,18 +199,27 @@ export default function App() {
     show('result');
   }
 
-  function onSaveUsername(name) { updateSt({ username: name, promptShown: true }); }
-  function onSkipSave() { updateSt({ promptShown: true }); }
-  async function handleGoogleLogin() { await signInWithGoogle(); }
+  function onSaveUsername(name) {
+    updateSt({ username: name, promptShown: true });
+  }
+
+  function onSkipSave() {
+    updateSt({ promptShown: true });
+  }
+
+  async function handleGoogleLogin() {
+    await signInWithGoogle();
+  }
+
   async function handleSignOut() {
-  await signOut();
-  // Clear all local data
-  localStorage.removeItem('toeic_progress');
-  localStorage.removeItem('toeic_guest_id');
-  setUser(null);
-  setSt(INITIAL_STATE);
-  setScreen('home');
-}
+    await signOut();
+    // Clear everything and reset
+    localStorage.removeItem('toeic_progress');
+    localStorage.removeItem('toeic_guest_id');
+    setUser(null);
+    setSt(INITIAL_STATE);
+    setScreen('home');
+  }
 
   if (loadingAuth) {
     return (
@@ -228,7 +231,7 @@ export default function App() {
 
   const props = {
     st, updateSt, show, speak,
-    CATS, LEVELS, BADGES, FAKE_PLAYERS,
+    CATS, LEVELS, BADGES,
     lvl, wpc, unlockedCount,
     currentCat, setCurrentCat,
     questions, qIdx, score, sessionXP,

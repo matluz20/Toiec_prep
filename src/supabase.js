@@ -5,7 +5,6 @@ const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Generate or retrieve a guest ID stored in localStorage
 export function getGuestId() {
   let guestId = localStorage.getItem('toeic_guest_id');
   if (!guestId) {
@@ -20,9 +19,7 @@ export async function signInWithGoogle() {
     provider: 'google',
     options: {
       redirectTo: window.location.origin,
-      queryParams: {
-        prompt: 'select_account', // Force Google to show account picker
-      },
+      queryParams: { prompt: 'select_account' },
     },
   });
   if (error) console.error('Login error:', error);
@@ -32,7 +29,6 @@ export async function signOut() {
   await supabase.auth.signOut();
 }
 
-// Save progress — works for both Google users and guests
 export async function saveProgressToCloud(userId, progress, isGuest = false) {
   const { error } = await supabase
     .from('progress')
@@ -50,7 +46,9 @@ export async function saveProgressToCloud(userId, progress, isGuest = false) {
       perfect_scores: progress.perfect_scores,
       fast_answers: progress.fast_answers,
       updated_at: new Date(),
-    });
+    },
+    { onConflict: 'user_id' }
+  );
   if (error) console.error('Save error:', error);
 }
 
@@ -64,7 +62,6 @@ export async function loadProgressFromCloud(userId) {
   return data;
 }
 
-// Fetch top players for leaderboard (both guests and Google users)
 export async function fetchLeaderboard() {
   const { data, error } = await supabase
     .from('progress')
