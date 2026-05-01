@@ -4,7 +4,9 @@ export default function Home({
   st, show, speak, CATS, LEVELS, BADGES,
   lvl, wpc, unlockedCount,
   startQuiz, startChallenge,startRevision,
-  user, handleGoogleLogin, handleSignOut,
+  user, handleGoogleLogin, handleSignOut,startCategoryQuiz,
+  startSuddenDeath,
+  startReversedQuiz,
 }) {
   const [wodOpen, setWodOpen] = useState(false);
   const [wod, setWod] = useState(null);
@@ -99,45 +101,58 @@ export default function Home({
 
 
       {/* Modes */}
-      <div className="sec-title">Training modes</div>
-      <div className="mode-grid">
-        <div className="mode-card" onClick={() => show('vocab')}>
-          <div className="mode-ic ic-blue">📚</div>
-          <div className="mode-lbl">Vocabulary</div>
-          <div className="mode-desc">Unlock words as you level up</div>
-        </div>
-        <div className="mode-card hl" onClick={() => startQuiz(false)}>
-          <div className="mode-ic ic-teal">⚡</div>
-          <div className="mode-lbl">Mixed quiz</div>
-          <div className="mode-desc">MCQ + flashcard + fill in + write</div>
-          <div className="mbadge mb-teal">+5 XP per correct</div>
-        </div>
-        <div className="mode-card" onClick={() => startQuiz(true)}>
-          <div className="mode-ic ic-amber">⏱️</div>
-          <div className="mode-lbl">Speed mode</div>
-          <div className="mode-desc">Fast answers = bonus XP</div>
-          <div className="mbadge mb-amber">+bonus under 10s</div>
-        </div>
-        <div className="mode-card" onClick={startChallenge}>
-          <div className="mode-ic ic-coral">💪</div>
-          <div className="mode-lbl">Daily challenge</div>
-          <div className="mode-desc">5 special questions</div>
-          <div className="mbadge mb-coral" style={st.challengeDone ? { background: '#E1F5EE', color: '#0F6E56' } : {}}>
-            {st.challengeDone ? '✓ done' : 'available'}
-          </div>
-        </div>
+<div className="sec-title">Training modes</div>
+<div className="mode-grid">
+  <div className="mode-card" onClick={() => show('vocab')}>
+    <div className="mode-ic ic-blue">📚</div>
+    <div className="mode-lbl">Vocabulary</div>
+    <div className="mode-desc">Unlock words as you level up</div>
+  </div>
+  <div className="mode-card hl" onClick={() => startQuiz(false)}>
+    <div className="mode-ic ic-teal">⚡</div>
+    <div className="mode-lbl">Mixed quiz</div>
+    <div className="mode-desc">MCQ + flashcard + fill in + write</div>
+    <div className="mbadge mb-teal">+5 XP per correct</div>
+  </div>
+  <div className="mode-card" onClick={() => startQuiz(true)}>
+    <div className="mode-ic ic-amber">⏱️</div>
+    <div className="mode-lbl">Speed mode</div>
+    <div className="mode-desc">Fast answers = bonus XP</div>
+    <div className="mbadge mb-amber">+bonus under 10s</div>
+  </div>
+  <div className="mode-card" onClick={startChallenge}>
+    <div className="mode-ic ic-coral">💪</div>
+    <div className="mode-lbl">Daily challenge</div>
+    <div className="mode-desc">5 special questions</div>
+    <div className="mbadge mb-coral" style={st.challengeDone ? { background: '#E1F5EE', color: '#0F6E56' } : {}}>
+      {st.challengeDone ? '✓ done' : 'available'}
+    </div>
+  </div>
+  <div className="mode-card" onClick={startRevision}>
+    <div className="mode-ic ic-purple">📖</div>
+    <div className="mode-lbl">Revision</div>
+    <div className="mode-desc">Review your missed words</div>
+    <div className="mbadge mb-purple">
+      {JSON.parse(localStorage.getItem('toeic_missed_words') || '[]').length > 0
+        ? `${JSON.parse(localStorage.getItem('toeic_missed_words')).length} words to review`
+        : 'No words yet'}
+    </div>
+  </div>
+  <div className="mode-card" onClick={startSuddenDeath}>
+    <div className="mode-ic ic-red">💀</div>
+    <div className="mode-lbl">Sudden Death</div>
+    <div className="mode-desc">One wrong answer = game over</div>
+    <div className="mbadge mb-red">How far can you go?</div>
+  </div>
+  <div className="mode-card" onClick={startReversedQuiz}>
+    <div className="mode-ic ic-purple">🔄</div>
+    <div className="mode-lbl">Reversed</div>
+    <div className="mode-desc">French → find the English word</div>
+    <div className="mbadge mb-purple">+5 XP per correct</div>
+  </div>
+</div>
 
-        <div className="mode-card" onClick={startRevision}>
-        <div className="mode-ic ic-purple">📖</div>
-        <div className="mode-lbl">Révision</div>
-        <div className="mode-desc">Revoir les mots ratés</div>
-        <div className="mbadge mb-purple">
-          {typeof window !== 'undefined' && JSON.parse(localStorage.getItem('toeic_missed_words') || '[]').length > 0
-            ? `${JSON.parse(localStorage.getItem('toeic_missed_words')).length} mots à revoir`
-            : 'Aucun mot pour l\'instant'}
-        </div>
-      </div>
-      </div>
+
 
       {/* Badges */}
       <div className="sec-title" style={{ marginTop: '0.25rem' }}>My badges</div>

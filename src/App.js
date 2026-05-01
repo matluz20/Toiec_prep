@@ -180,7 +180,74 @@ export default function App() {
   show('quiz');
 }
 
-  function onAnswer({ correct, xpGained, word, def, fast }) {
+
+  // Mode catégorie — choisir une catégorie spécifique
+function startCategoryQuiz(cat) {
+  const words = CATS[cat].words.slice(0, wpc);
+  if (words.length < 4) { alert('Not enough words unlocked in this category!'); return; }
+  const allDefs = Object.values(CATS).flatMap((c) => c.words).map((w) => w.d);
+  const pool = [];
+  words.forEach((item) => {
+    const wrongDefs = allDefs.filter((d) => d !== item.d).sort(() => Math.random() - 0.5).slice(0, 3);
+    pool.push({
+      word: item.w, type: 'mcq',
+      q: `What does "${item.w}" mean?`,
+      opts: [...wrongDefs, item.d].sort(() => Math.random() - 0.5),
+      correct: item.d, ex: item.e,
+      hint: `Type: ${item.t} — starts with "${item.w[0].toUpperCase()}" (${item.w.length} letters)`,
+      dfr: item.dfr,
+    });
+    pool.push({
+      word: item.w, type: 'write',
+      q: `Write the English word that means:\n"${item.dfr}"`,
+      correct: item.w, ex: item.e,
+      hint: `Starts with "${item.w[0].toUpperCase()}" — ${item.w.length} letters`,
+    });
+  });
+  const shuffled = pool.sort(() => Math.random() - 0.5).slice(0, 10);
+  setQuestions(shuffled);
+  setQIdx(0); setScore(0); setSessionXP(0); setMissedWords([]);
+  setTimerMode(false);
+  setQuizTitle(`${CATS[cat].icon} ${cat}`);
+  show('quiz');
+}
+
+// Mode mort subite
+function startSuddenDeath() {
+  const pool = buildPool(CATS, wpc);
+  if (!pool.length) return;
+  setQuestions(pool.slice(0, 30)); // 30 questions max
+  setQIdx(0); setScore(0); setSessionXP(0); setMissedWords([]);
+  setTimerMode(false);
+  setQuizTitle('💀 Sudden Death');
+  show('quiz');
+}
+
+// Mode inversé — définition française → trouver le mot anglais
+function startReversedQuiz() {
+  const allWords = Object.values(CATS).flatMap((c) => c.words.slice(0, wpc));
+  if (allWords.length < 4) return;
+  const allWordsList = allWords.map((w) => w.w);
+  const pool = allWords.map((item) => {
+    const wrongWords = allWordsList.filter((w) => w !== item.w).sort(() => Math.random() - 0.5).slice(0, 3);
+    return {
+      word: item.w, type: 'mcq',
+      q: `Which word means:\n"${item.dfr}" ?`,
+      opts: [...wrongWords, item.w].sort(() => Math.random() - 0.5),
+      correct: item.w, ex: item.e,
+      hint: `Starts with "${item.w[0].toUpperCase()}" — ${item.w.length} letters`,
+      dfr: item.dfr,
+    };
+  });
+  setQuestions(pool.sort(() => Math.random() - 0.5).slice(0, 10));
+  setQIdx(0); setScore(0); setSessionXP(0); setMissedWords([]);
+  setTimerMode(false);
+  setQuizTitle('🔄 Reversed quiz');
+  show('quiz');
+}
+
+
+  function onAnswer({ correct, xpGained, word, def, fast, suddenDeath }) {
     if (correct) {
       setScore((s) => s + 1);
       setSessionXP((s) => s + xpGained);
@@ -191,6 +258,10 @@ export default function App() {
       }));
     } else {
       setMissedWords((prev) => [...prev, { word, def }]);
+      // Sudden death — end quiz immediately after wrong answer
+      if (suddenDeath) {
+        setTimeout(() => onQuizEnd(), 1500);
+      }
     }
   }
 
@@ -263,7 +334,7 @@ export default function App() {
     );
   }
 
-  const props = {
+  const props = { 
     st, updateSt, show, speak,
     CATS, LEVELS, BADGES,
     lvl, wpc, unlockedCount,
@@ -274,7 +345,11 @@ export default function App() {
     onSaveUsername, onSkipSave,
     lbTab, setLbTab,
     startQuiz, startChallenge,
-    user, handleGoogleLogin, handleSignOut, startRevision,
+    user, handleGoogleLogin, handleSignOut,
+    startRevision,
+    startCategoryQuiz,
+    startSuddenDeath,
+    startReversedQuiz,
   };
 
     if (showSplash) {

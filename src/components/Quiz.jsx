@@ -70,17 +70,17 @@ export default function Quiz({
   }
 
   function handleOpt(opt) {
-    if (answered || answeredRef.current) return;
-    stopTimer();
-    answeredRef.current = true;
-    const ok = opt === q.correct;
-    const fast = timerMode && timeLeft > 10;
-    const xp = ok ? (hintUsed ? 3 : fast ? 8 : 5) : 0;
-    setSelectedOpt(opt);
-    setAnswered(true);
-    setIsCorrect(ok);
-    onAnswer({ correct: ok, xpGained: xp, word: q.word, def: q.correct, fast });
-  }
+  if (answered || answeredRef.current) return;
+  stopTimer();
+  answeredRef.current = true;
+  const ok = opt === q.correct;
+  const fast = timerMode && timeLeft > 10;
+  const xp = ok ? (hintUsed ? 3 : fast ? 8 : 5) : 0;
+  setSelectedOpt(opt);
+  setAnswered(true);
+  setIsCorrect(ok);
+  onAnswer({ correct: ok, xpGained: xp, word: q.word, def: q.correct, fast, suddenDeath: !ok && quizTitle.includes('Sudden Death') });
+}
 
   function handleFlashAnswer(knew) {
     if (answeredRef.current) return;
@@ -101,7 +101,7 @@ export default function Quiz({
     setWriteChecked(true);
     setAnswered(true);
     setIsCorrect(ok);
-    onAnswer({ correct: ok, xpGained: xp, word: q.correct, def: q.correct, fast: false });
+    onAnswer({ correct: ok, xpGained: xp, word: q.correct, def: q.correct, fast: false, suddenDeath: !ok && quizTitle.includes('Sudden Death') });
   }
 
   if (!q) return null;
