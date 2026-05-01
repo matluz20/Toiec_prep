@@ -54,6 +54,9 @@ function stateToCloud(st) {
 
 export default function App() {
   const [screen, setScreen] = useState('home');
+  const [showSplash, setShowSplash] = useState(() => {  // ← ajoute ici
+  return !localStorage.getItem('toeic_visited');
+  });
   const [st, setSt] = useState(() => loadProgress() || INITIAL_STATE);
   const [user, setUser] = useState(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
@@ -247,7 +250,38 @@ export default function App() {
     startQuiz, startChallenge,
     user, handleGoogleLogin, handleSignOut,
   };
-
+  
+    if (showSplash) {
+    return (
+      <div className="splash">
+        <div className="splash-content">
+          <div className="splash-logo">TOEIC Prep</div>
+          <div className="splash-emoji">🎯</div>
+          <h1 className="splash-title">Prépare ton TOEIC<br/>sans stress</h1>
+          <p className="splash-desc">
+            Vocabulaire essentiel, quiz variés et système
+            de progression pour maximiser ton score.
+          </p>
+          <div className="splash-features">
+            <div className="splash-feat">📚 500+ mots TOEIC</div>
+            <div className="splash-feat">⚡ Quiz interactifs</div>
+            <div className="splash-feat">🏆 Classement mondial</div>
+            <div className="splash-feat">☁️ Progression sauvegardée</div>
+          </div>
+          <button
+            className="splash-btn"
+            onClick={() => {
+              localStorage.setItem('toeic_visited', 'true');
+              setShowSplash(false);
+            }}
+          >
+            Commencer gratuitement →
+          </button>
+          <p className="splash-note">Aucune inscription requise pour commencer</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="app">
       {screen === 'home' && <Home {...props} />}
@@ -256,6 +290,7 @@ export default function App() {
       {screen === 'quiz' && <Quiz {...props} />}
       {screen === 'result' && <Result {...props} />}
       {screen === 'leaderboard' && <Leaderboard {...props} />}
+      
     </div>
   );
 }

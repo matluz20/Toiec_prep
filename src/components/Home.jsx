@@ -11,7 +11,7 @@ export default function Home({
 
   useEffect(() => {
     const all = Object.values(CATS).flatMap((c) => c.words);
-    const item = all[Math.floor(Date.now() / 60000) % all.length];
+    const item = all[Math.floor(Math.random() * all.length)];
     setWod(item);
   }, [CATS]);
 
@@ -85,7 +85,7 @@ export default function Home({
       {/* Stats */}
       <div className="stats-row">
         <div className="stat-box"><div className="stat-num">{unlockedCount}</div><div className="stat-lbl">unlocked</div></div>
-        <div className="stat-box"><div className="stat-num">96</div><div className="stat-lbl">total words</div></div>
+        <div className="stat-box"><div className="stat-num">500</div><div className="stat-lbl">total words</div></div>
         <div className="stat-box"><div className="stat-num">{st.bestScore !== null ? `${st.bestScore}/10` : '—'}</div><div className="stat-lbl">best score</div></div>
         <div className="stat-box"><div className="stat-num">{st.earnedBadges.length}</div><div className="stat-lbl">badges</div></div>
       </div>

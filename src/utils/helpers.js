@@ -34,7 +34,9 @@ export function speak(text) {
 }
 
 export function buildPool(CATS, wpc) {
-  const all = Object.values(CATS).flatMap((c) => c.words.slice(0, wpc));
+  const all = Object.values(CATS).flatMap((c) =>
+  [...c.words].sort(() => Math.random() - 0.5).slice(0, wpc)
+);
   if (all.length < 4) return [];
   const allDefs = all.map((w) => w.d);
   const allWords = all.map((w) => w.w);
