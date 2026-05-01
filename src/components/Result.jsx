@@ -29,17 +29,11 @@ export default function Result({
 
   const uniq = missedWords.filter((v, i, a) => a.findIndex((x) => x.word === v.word) === i);
 
-  // Show save prompt only after first quiz, not logged in, not already shown
-  const showSavePrompt = !st.promptShown && !user;
+  // Show Google sign-in prompt after first quiz if not logged in
+  const showGooglePrompt = !st.promptShown && !user;
 
   // Show username picker after Google login if no username yet
   const showUsernamePicker = user && !st.username && !usernameSet;
-
-  function handleSaveGuest() {
-    const val = inputVal.trim();
-    if (!val) return;
-    onSaveUsername(val);
-  }
 
   function handleSetUsername() {
     const val = inputVal.trim();
@@ -69,13 +63,34 @@ export default function Result({
           <div className="r-msg">{msg}</div>
         </div>
 
-        {/* Username picker — shown after Google login if no username */}
+        {/* Google sign-in prompt — after first quiz, not logged in */}
+        {showGooglePrompt && (
+          <div className="save-prompt">
+            <div className="save-prompt-icon">☁️</div>
+            <div className="save-prompt-title">Save your progress!</div>
+            <div className="save-prompt-sub">
+              You earned <strong>+{sessionXP} XP</strong> — sign in with Google
+              to save on all your devices and join the leaderboard.
+            </div>
+            <button className="google-btn-full" onClick={handleGoogleLogin}>
+              <GoogleIcon />
+              Continue with Google
+            </button>
+            <div style={{ textAlign: 'center', marginTop: 10 }}>
+              <span className="save-skip" onClick={onSkipSave}>
+                Continue without saving
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Username picker — after Google login, no username yet */}
         {showUsernamePicker && (
           <div className="save-prompt">
             <div className="save-prompt-icon">✏️</div>
             <div className="save-prompt-title">Choose your username</div>
             <div className="save-prompt-sub">
-              This is what others will see on the leaderboard — not your real name.
+              This is what others will see on the leaderboard.
             </div>
             <div className="save-prompt-guest">
               <input
@@ -97,41 +112,10 @@ export default function Result({
           </div>
         )}
 
-        {/* Save prompt — shown after first quiz if not logged in */}
-        {showSavePrompt && (
-          <div className="save-prompt">
-            <div className="save-prompt-icon">🏆</div>
-            <div className="save-prompt-title">Save your progress!</div>
-            <div className="save-prompt-sub">
-              You earned <strong>+{sessionXP} XP</strong> — don't lose it!
-              Sign in to save on all your devices and join the leaderboard.
-            </div>
-            <button className="google-btn-full" onClick={handleGoogleLogin}>
-              <GoogleIcon />
-              Continue with Google
-            </button>
-            <div className="save-prompt-or">or play as guest</div>
-            <div className="save-prompt-guest">
-              <input
-                className="save-input"
-                placeholder="Choose a username..."
-                maxLength={20}
-                value={inputVal}
-                onChange={(e) => setInputVal(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleSaveGuest(); }}
-              />
-              <button className="save-go" onClick={handleSaveGuest}>Save →</button>
-            </div>
-            <div style={{ textAlign: 'center', marginTop: 8 }}>
-              <span className="save-skip" onClick={onSkipSave}>Skip for now</span>
-            </div>
-          </div>
-        )}
-
-        {/* Synced banner */}
+        {/* Synced banner — Google user with username */}
         {user && st.username && (
           <div className="sync-banner">
-            ☁️ Progress saved · playing as <strong>{st.username}</strong>
+            ☁️ Progress saved · <strong>{st.username}</strong>
           </div>
         )}
 

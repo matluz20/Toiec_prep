@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { CATS, LEVELS, BADGES } from './data/words';
 import { getLvl, getWPC, getUnlockedCount, speak, buildPool, saveProgress, loadProgress } from './utils/helpers';
-import { supabase, signInWithGoogle, signOut, saveProgressToCloud, loadProgressFromCloud, getGuestId } from './supabase';
+import { supabase, signInWithGoogle, signOut, saveProgressToCloud, loadProgressFromCloud } from './supabase';
 import Home from './components/Home';
 import Vocab from './components/Vocab';
 import VocabList from './components/VocabList';
@@ -23,7 +23,7 @@ const INITIAL_STATE = {
   fastAnswers: 0,
 };
 
-function stateFromCloud(data, fallbackName) {
+function stateFromCloud(data) {
   return {
     xp: data.xp || 0,
     streak: data.streak || 0,
@@ -66,9 +66,7 @@ export default function App() {
   const [missedWords, setMissedWords] = useState([]);
   const [quizTitle, setQuizTitle] = useState('');
   const [lbTab, setLbTab] = useState('xp');
-  const [savingCloud, setSavingCloud] = useState(false);
 
-  // Load session on mount
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
@@ -91,38 +89,36 @@ export default function App() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function syncFromCloud(googleUser) {
-  const data = await loadProgressFromCloud(googleUser.id);
-  if (data) {
-    // Load cloud data — keep username from cloud, NOT from Google profile
-    const cloudSt = stateFromCloud(data, null);
-    setSt(cloudSt);
-    saveProgress(cloudSt);
-  } else {
-    // First time — push local progress but clear username so picker shows
-    const local = loadProgress() || INITIAL_STATE;
-    const merged = { ...local, username: null, promptShown: true };
-    setSt(merged);
-    saveProgress(merged);
-    await saveProgressToCloud(googleUser.id, stateToCloud(merged), false);
-  }
-}
-
-  // Auto-save to cloud whenever state changes
-  useEffect(() => {
-    saveProgress(st);
-    if (!savingCloud) {
-      setSavingCloud(true);
-      const timeout = setTimeout(async () => {
-        if (user) {
-          await saveProgressToCloud(user.id, stateToCloud(st), false);
-        } else if (st.promptShown && st.username) {
-          await saveProgressToCloud(getGuestId(), stateToCloud(st), true);
-        }
-        setSavingCloud(false);
-      }, 1000); // debounce 1s
-      return () => clearTimeout(timeout);
+    const data = await loadProgressFromCloud(googleUser.id);
+    if (data) {
+      // Existing cloud data — load it (username comes from cloud only)
+      const cloudSt = stateFromCloud(data);
+      setSt(cloudSt);
+      saveProgress(cloudSt);
+    } else {
+      // First Google login — start fresh, show username picker
+      const local = loadProgress() || INITIAL_STATE;
+      const merged = {
+        ...local,
+        username: null, // force username picker
+        promptShown: true,
+      };
+      setSt(merged);
+      saveProgress(merged);
+      await saveProgressToCloud(googleUser.id, stateToCloud(merged), false);
     }
-  }, [st]); // eslint-disable-line react-hooks/exhaustive-deps
+  }
+
+  // Save to cloud only for Google users
+  useEffect(() => {
+    saveProgress(st); // always save locally
+    if (user) {
+      const timer = setTimeout(() => {
+        saveProgressToCloud(user.id, stateToCloud(st), false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [st, user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const lvl = getLvl(st.xp, LEVELS);
   const wpc = getWPC(st.xp, LEVELS);
@@ -169,7 +165,11 @@ export default function App() {
     if (correct) {
       setScore((s) => s + 1);
       setSessionXP((s) => s + xpGained);
-      setSt((prev) => ({ ...prev, xp: prev.xp + xpGained, fastAnswers: fast ? prev.fastAnswers + 1 : prev.fastAnswers }));
+      setSt((prev) => ({
+        ...prev,
+        xp: prev.xp + xpGained,
+        fastAnswers: fast ? prev.fastAnswers + 1 : prev.fastAnswers,
+      }));
     } else {
       setMissedWords((prev) => [...prev, { word, def }]);
     }
@@ -199,10 +199,12 @@ export default function App() {
     show('result');
   }
 
+  // Google user sets username after login
   function onSaveUsername(name) {
     updateSt({ username: name, promptShown: true });
   }
 
+  // Guest skips — promptShown true so prompt doesn't show again this session
   function onSkipSave() {
     updateSt({ promptShown: true });
   }
@@ -213,7 +215,6 @@ export default function App() {
 
   async function handleSignOut() {
     await signOut();
-    // Clear everything and reset
     localStorage.removeItem('toeic_progress');
     localStorage.removeItem('toeic_guest_id');
     setUser(null);
