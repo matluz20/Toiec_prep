@@ -329,3 +329,138 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 @media (min-width: 1024px) {
   .app { margin: 3rem auto; }
 }
+
+/* USERNAME PICKER ENHANCED */
+.save-prompt {
+  background: linear-gradient(135deg, #f9f9f7 0%, #ffffff 100%);
+  border: 1px solid #e0e0d8;
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+.save-prompt-icon {
+  font-size: 36px;
+  text-align: center;
+  margin-bottom: 10px;
+  animation: bounceIn 0.4s ease;
+}
+.save-prompt-title {
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 6px;
+  color: #1a1a1a;
+}
+.save-prompt-sub {
+  font-size: 12px;
+  color: #888;
+  text-align: center;
+  margin-bottom: 1.1rem;
+  line-height: 1.6;
+}
+.save-prompt-guest {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.save-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid #e0e0d8;
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  background: white;
+}
+.save-input:focus {
+  border-color: #1D9E75;
+  box-shadow: 0 0 0 3px rgba(29,158,117,0.1);
+}
+.save-go {
+  padding: 0.75rem 1.1rem;
+  border-radius: 12px;
+  border: none;
+  background: #1D9E75;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, transform 0.1s;
+  white-space: nowrap;
+}
+.save-go:hover { background: #0F6E56; transform: translateY(-1px); }
+.save-go:disabled { opacity: 0.6; cursor: default; transform: none; }
+.save-skip {
+  font-size: 12px;
+  color: #bbb;
+  cursor: pointer;
+  text-decoration: underline;
+  display: inline-block;
+  transition: color 0.15s;
+}
+.save-skip:hover { color: #888; }
+.save-prompt-or {
+  text-align: center;
+  font-size: 12px;
+  color: #bbb;
+  margin: 12px 0;
+  position: relative;
+}
+.save-prompt-or::before,
+.save-prompt-or::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 38%;
+  height: 0.5px;
+  background: #e0e0d8;
+}
+.save-prompt-or::before { left: 0; }
+.save-prompt-or::after { right: 0; }
+.username-error {
+  font-size: 11px;
+  color: #D85A30;
+  margin-top: 6px;
+  padding: 4px 8px;
+  background: #FAECE7;
+  border-radius: 6px;
+  display: inline-block;
+}
+.input-error { border-color: #D85A30 !important; }
+
+/* EDIT USERNAME PANEL */
+.edit-username-panel {
+  background: white;
+  border: 1.5px solid #1D9E75;
+  border-radius: 14px;
+  padding: 1.1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 16px rgba(29,158,117,0.1);
+}
+.edit-username-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #1a1a1a;
+}
+.edit-username-btn {
+  font-size: 11px;
+  color: #888;
+  background: none;
+  border: 0.5px solid #e0e0d8;
+  border-radius: 20px;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.edit-username-btn:hover { border-color: #1D9E75; color: #1D9E75; }
+
+@keyframes bounceIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  70% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
