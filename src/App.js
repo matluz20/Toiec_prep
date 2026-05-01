@@ -187,26 +187,26 @@ export default function App() {
   }
 
   function onQuizEnd() {
-    const finalScore = score;
-    const isChallenge = quizTitle.includes('challenge');
-    setSt((prev) => {
-      const newBestScore =
-        prev.bestScore === null || finalScore > prev.bestScore
-          ? finalScore : prev.bestScore;
-      const updatedSt = {
-        ...prev,
-        streak: newStreak, // ← ajoute ici
-        quizzes: prev.quizzes + 1,
-        bestScore: newBestScore,
-        perfectScores: finalScore === questions.length ? prev.perfectScores + 1 : prev.perfectScores,
-        challengeDone: isChallenge ? true : prev.challengeDone,
-      };
-      const { earnedBadges } = checkBadges(updatedSt);
-      updatedSt.earnedBadges = earnedBadges;
-      return updatedSt;
-    });
-    show('result');
-  }
+  const finalScore = score;
+  const isChallenge = quizTitle.includes('challenge');
+  const newStreak = updateStreak(st); // ← doit être ici, AVANT setSt
+
+  setSt((prev) => {
+    const newBestScore = prev.bestScore === null || finalScore > prev.bestScore ? finalScore : prev.bestScore;
+    const updatedSt = {
+      ...prev,
+      streak: newStreak,
+      quizzes: prev.quizzes + 1,
+      bestScore: newBestScore,
+      perfectScores: finalScore === questions.length ? prev.perfectScores + 1 : prev.perfectScores,
+      challengeDone: isChallenge ? true : prev.challengeDone,
+    };
+    const { earnedBadges } = checkBadges(updatedSt);
+    updatedSt.earnedBadges = earnedBadges;
+    return updatedSt;
+  });
+  show('result');
+}
 
   function onSaveUsername(name) {
     updateSt({ username: name, promptShown: true });
@@ -324,17 +324,7 @@ export default function App() {
           <span className="nav-icon">🏆</span>
           <span className="nav-label">Rankings</span>
         </button>
-        <button
-          className={`nav-item${screen === 'result' ? ' active' : ''}`}
-          onClick={() => show('home')}
-        >
-          <span className="nav-icon">
-            {user
-              ? <img src={user.user_metadata?.avatar_url} alt="avatar" className="nav-avatar" />
-              : '👤'}
-          </span>
-          <span className="nav-label">{user ? 'Profil' : 'Compte'}</span>
-        </button>
+      
       </nav>
     )}
       
