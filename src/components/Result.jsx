@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { checkUsernameAvailable, updateUsername } from '../supabase';
 
 const GoogleIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" style={{ marginRight: 8, flexShrink: 0 }}>
@@ -18,6 +19,8 @@ export default function Result({
   user, handleGoogleLogin,
 }) {
   const [inputVal, setInputVal] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [usernameLoading, setUsernameLoading] = useState(false);
   const [usernameSet, setUsernameSet] = useState(false);
 
   const pct = score / questions.length;
@@ -29,17 +32,29 @@ export default function Result({
 
   const uniq = missedWords.filter((v, i, a) => a.findIndex((x) => x.word === v.word) === i);
 
-  // Show Google sign-in prompt after first quiz if not logged in
-  const showGooglePrompt = !st.promptShown && !user;
+  // Show Google prompt after first quiz if not logged in and prompt not shown yet
+  const showGooglePrompt = !user && !st.promptShown;
 
   // Show username picker after Google login if no username yet
   const showUsernamePicker = user && !st.username && !usernameSet;
 
-  function handleSetUsername() {
+  async function handleSetUsername() {
     const val = inputVal.trim();
-    if (!val) return;
+    if (!val || val.length < 3) {
+      setUsernameError('Username must be at least 3 characters');
+      return;
+    }
+    setUsernameLoading(true);
+    setUsernameError('');
+    const available = await checkUsernameAvailable(val);
+    if (!available) {
+      setUsernameError('This username is already taken');
+      setUsernameLoading(false);
+      return;
+    }
     onSaveUsername(val);
     setUsernameSet(true);
+    setUsernameLoading(false);
   }
 
   function handleUseFirstName() {
@@ -63,7 +78,7 @@ export default function Result({
           <div className="r-msg">{msg}</div>
         </div>
 
-        {/* Google sign-in prompt — after first quiz, not logged in */}
+        {/* Google prompt — after first quiz, not logged in */}
         {showGooglePrompt && (
           <div className="save-prompt">
             <div className="save-prompt-icon">☁️</div>
@@ -90,20 +105,30 @@ export default function Result({
             <div className="save-prompt-icon">✏️</div>
             <div className="save-prompt-title">Choose your username</div>
             <div className="save-prompt-sub">
-              This is what others will see on the leaderboard.
+              This is what others will see on the leaderboard — not your real name.
+              Must be unique and at least 3 characters.
             </div>
             <div className="save-prompt-guest">
               <input
-                className="save-input"
+                className={`save-input${usernameError ? ' input-error' : ''}`}
                 placeholder="e.g. TOEICmaster95..."
                 maxLength={20}
                 value={inputVal}
-                onChange={(e) => setInputVal(e.target.value)}
+                onChange={(e) => { setInputVal(e.target.value); setUsernameError(''); }}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleSetUsername(); }}
                 autoFocus
               />
-              <button className="save-go" onClick={handleSetUsername}>Save →</button>
+              <button
+                className="save-go"
+                onClick={handleSetUsername}
+                disabled={usernameLoading}
+              >
+                {usernameLoading ? '...' : 'Save →'}
+              </button>
             </div>
+            {usernameError && (
+              <div className="username-error">{usernameError}</div>
+            )}
             <div style={{ textAlign: 'center', marginTop: 8 }}>
               <span className="save-skip" onClick={handleUseFirstName}>
                 Use my first name instead
@@ -112,10 +137,10 @@ export default function Result({
           </div>
         )}
 
-        {/* Synced banner — Google user with username */}
+        {/* Synced banner */}
         {user && st.username && (
           <div className="sync-banner">
-            ☁️ Progress saved · <strong>{st.username}</strong>
+            ☁️ Progress saved · playing as <strong>{st.username}</strong>
           </div>
         )}
 

@@ -35,7 +35,7 @@ export async function saveProgressToCloud(userId, progress, isGuest = false) {
     .upsert({
       user_id: userId,
       is_guest: isGuest,
-      display_name: progress.username || (isGuest ? 'Guest' : null),
+      display_name: progress.username || null,
       xp: progress.xp,
       streak: progress.streak,
       quizzes: progress.quizzes,
@@ -46,9 +46,7 @@ export async function saveProgressToCloud(userId, progress, isGuest = false) {
       perfect_scores: progress.perfect_scores,
       fast_answers: progress.fast_answers,
       updated_at: new Date(),
-    },
-    { onConflict: 'user_id' }
-  );
+    }, { onConflict: 'user_id' });
   if (error) console.error('Save error:', error);
 }
 
@@ -66,8 +64,32 @@ export async function fetchLeaderboard() {
   const { data, error } = await supabase
     .from('progress')
     .select('user_id, display_name, username, xp, best_score, is_guest')
+    .not('username', 'is', null)
     .order('xp', { ascending: false })
     .limit(50);
   if (error) { console.error('Leaderboard error:', error); return []; }
   return data || [];
+}
+
+// Check if username is already taken
+export async function checkUsernameAvailable(username) {
+  const { data } = await supabase
+    .from('progress')
+    .select('username')
+    .eq('username', username)
+    .single();
+  return !data; // true = available
+}
+
+// Update username only
+export async function updateUsername(userId, username) {
+  const { error } = await supabase
+    .from('progress')
+    .update({ username, display_name: username })
+    .eq('user_id', userId);
+  if (error) {
+    if (error.code === '23505') return { error: 'Username already taken' };
+    return { error: error.message };
+  }
+  return { error: null };
 }

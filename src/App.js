@@ -91,27 +91,22 @@ export default function App() {
   async function syncFromCloud(googleUser) {
     const data = await loadProgressFromCloud(googleUser.id);
     if (data) {
-      // Existing cloud data — load it (username comes from cloud only)
       const cloudSt = stateFromCloud(data);
       setSt(cloudSt);
       saveProgress(cloudSt);
     } else {
-      // First Google login — start fresh, show username picker
+      // First Google login — preserve XP but force username picker
       const local = loadProgress() || INITIAL_STATE;
-      const merged = {
-        ...local,
-        username: null, // force username picker
-        promptShown: true,
-      };
+      const merged = { ...local, username: null, promptShown: true };
       setSt(merged);
       saveProgress(merged);
       await saveProgressToCloud(googleUser.id, stateToCloud(merged), false);
     }
   }
 
-  // Save to cloud only for Google users
+  // Save locally always, save to cloud only for Google users
   useEffect(() => {
-    saveProgress(st); // always save locally
+    saveProgress(st);
     if (user) {
       const timer = setTimeout(() => {
         saveProgressToCloud(user.id, stateToCloud(st), false);
@@ -131,7 +126,10 @@ export default function App() {
   function checkBadges(currentSt) {
     const updated = [...currentSt.earnedBadges];
     BADGES.forEach((b) => {
-      if (!updated.includes(b.id) && b.cond({ ...currentSt, unlockedCount: getUnlockedCount(currentSt.xp, LEVELS, CATS) })) {
+      if (!updated.includes(b.id) && b.cond({
+        ...currentSt,
+        unlockedCount: getUnlockedCount(currentSt.xp, LEVELS, CATS),
+      })) {
         updated.push(b.id);
       }
     });
@@ -151,7 +149,10 @@ export default function App() {
   }
 
   function startChallenge() {
-    if (st.challengeDone) { alert('Daily challenge already done! Come back tomorrow 💪'); return; }
+    if (st.challengeDone) {
+      alert('Daily challenge already done! Come back tomorrow 💪');
+      return;
+    }
     const pool = buildPool(CATS, wpc);
     if (!pool.length) return;
     setQuestions(pool.slice(0, 5));
@@ -184,12 +185,15 @@ export default function App() {
     const finalScore = score;
     const isChallenge = quizTitle.includes('challenge');
     setSt((prev) => {
-      const newBestScore = prev.bestScore === null || finalScore > prev.bestScore ? finalScore : prev.bestScore;
+      const newBestScore =
+        prev.bestScore === null || finalScore > prev.bestScore
+          ? finalScore : prev.bestScore;
       const updatedSt = {
         ...prev,
         quizzes: prev.quizzes + 1,
         bestScore: newBestScore,
-        perfectScores: finalScore === questions.length ? prev.perfectScores + 1 : prev.perfectScores,
+        perfectScores: finalScore === questions.length
+          ? prev.perfectScores + 1 : prev.perfectScores,
         challengeDone: isChallenge ? true : prev.challengeDone,
       };
       const { earnedBadges } = checkBadges(updatedSt);
@@ -199,14 +203,14 @@ export default function App() {
     show('result');
   }
 
-  // Google user sets username after login
   function onSaveUsername(name) {
     updateSt({ username: name, promptShown: true });
   }
 
-  // Guest skips — promptShown true so prompt doesn't show again this session
+  // Guest skips — mark promptShown so prompt doesn't show again this session
+  // but do NOT save to cloud
   function onSkipSave() {
-    updateSt({ promptShown: true });
+    setSt((prev) => ({ ...prev, promptShown: true }));
   }
 
   async function handleGoogleLogin() {

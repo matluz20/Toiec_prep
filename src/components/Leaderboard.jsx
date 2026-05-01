@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { fetchLeaderboard } from '../supabase';
-import { getGuestId } from '../supabase';
+import { fetchLeaderboard, updateUsername, checkUsernameAvailable } from '../supabase';
 
-export default function Leaderboard({ show, st, lvl, lbTab, setLbTab, user }) {
+export default function Leaderboard({ show, st, lvl, lbTab, setLbTab, user, onSaveUsername }) {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editMode, setEditMode] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [editError, setEditError] = useState('');
+  const [editLoading, setEditLoading] = useState(false);
+  const [editSuccess, setEditSuccess] = useState(false);
 
   useEffect(() => {
     fetchLeaderboard().then((data) => {
@@ -13,29 +17,60 @@ export default function Leaderboard({ show, st, lvl, lbTab, setLbTab, user }) {
     });
   }, []);
 
-  // Current user ID (Google or guest)
-  const myId = user ? user.id : getGuestId();
+  const myId = user?.id;
+  const myName = st.username || 'Anonymous';
 
-  // Build display name
-  const myName = st.username || (user ? user.user_metadata?.full_name : 'You');
-
-  // Make sure current user appears even if not in DB yet
   const myEntry = players.find((p) => p.user_id === myId);
   const allPlayers = myEntry
     ? players
-    : [...players, { user_id: myId, display_name: myName, xp: st.xp, best_score: st.bestScore || 0, is_guest: !user }];
+    : user
+      ? [...players, { user_id: myId, display_name: myName, xp: st.xp, best_score: st.bestScore || 0, is_guest: false }]
+      : players;
 
   const sorted =
     lbTab === 'xp'
       ? [...allPlayers].sort((a, b) => b.xp - a.xp)
       : [...allPlayers].sort((a, b) => (b.best_score || 0) - (a.best_score || 0) || b.xp - a.xp);
 
-  const myRank = sorted.findIndex((p) => p.user_id === myId) + 1;
+  const myRank = user ? sorted.findIndex((p) => p.user_id === myId) + 1 : '—';
   const medals = ['🥇', '🥈', '🥉'];
   const rankCls = ['gold', 'silver', 'bronze'];
 
   function getDisplayName(p) {
-    return p.display_name || p.username || (p.is_guest ? 'Guest' : 'Anonymous');
+    return p.display_name || p.username || 'Anonymous';
+  }
+
+  async function handleUpdateUsername() {
+    const val = newUsername.trim();
+    if (!val || val.length < 3) {
+      setEditError('At least 3 characters required');
+      return;
+    }
+    if (val === st.username) {
+      setEditMode(false);
+      return;
+    }
+    setEditLoading(true);
+    setEditError('');
+    const available = await checkUsernameAvailable(val);
+    if (!available) {
+      setEditError('Username already taken');
+      setEditLoading(false);
+      return;
+    }
+    const { error } = await updateUsername(user.id, val);
+    if (error) {
+      setEditError(error);
+      setEditLoading(false);
+      return;
+    }
+    onSaveUsername(val);
+    setEditSuccess(true);
+    setEditMode(false);
+    setEditLoading(false);
+    // Refresh leaderboard
+    fetchLeaderboard().then((data) => setPlayers(data));
+    setTimeout(() => setEditSuccess(false), 3000);
   }
 
   return (
@@ -51,14 +86,14 @@ export default function Leaderboard({ show, st, lvl, lbTab, setLbTab, user }) {
       <div className="lb-wrap">
         {/* My card */}
         <div className="lb-user-card">
-          {user ? (
-            <img src={user.user_metadata?.avatar_url} alt="avatar" className="lb-avatar-img" />
+          {user?.user_metadata?.avatar_url ? (
+            <img src={user.user_metadata.avatar_url} alt="avatar" className="lb-avatar-img" />
           ) : (
-            <div className="lb-avatar">{(myName || '?')[0].toUpperCase()}</div>
+            <div className="lb-avatar">{(myName)[0].toUpperCase()}</div>
           )}
           <div className="lb-user-info">
             <div className="lb-username">
-              {myName || 'Guest'}
+              {myName}
               {user
                 ? <span className="lb-badge google">Google</span>
                 : <span className="lb-badge guest">Guest</span>}
@@ -67,8 +102,45 @@ export default function Leaderboard({ show, st, lvl, lbTab, setLbTab, user }) {
               {st.xp} XP · Best: {st.bestScore || 0}/10 · Level {lvl + 1}
             </div>
           </div>
-          <div className="lb-user-rank">#{myRank}</div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+            <div className="lb-user-rank">#{myRank}</div>
+            {user && (
+              <button
+                className="edit-username-btn"
+                onClick={() => { setEditMode(true); setNewUsername(st.username || ''); setEditError(''); }}
+              >
+                ✏️ Edit
+              </button>
+            )}
+          </div>
         </div>
+
+        {/* Edit username panel */}
+        {editMode && (
+          <div className="edit-username-panel">
+            <div className="edit-username-title">Change your username</div>
+            <div className="save-prompt-guest">
+              <input
+                className={`save-input${editError ? ' input-error' : ''}`}
+                placeholder="New username..."
+                maxLength={20}
+                value={newUsername}
+                onChange={(e) => { setNewUsername(e.target.value); setEditError(''); }}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleUpdateUsername(); }}
+                autoFocus
+              />
+              <button className="save-go" onClick={handleUpdateUsername} disabled={editLoading}>
+                {editLoading ? '...' : 'Save →'}
+              </button>
+            </div>
+            {editError && <div className="username-error">{editError}</div>}
+            <span className="save-skip" onClick={() => setEditMode(false)}>Cancel</span>
+          </div>
+        )}
+
+        {editSuccess && (
+          <div className="sync-banner">✓ Username updated successfully!</div>
+        )}
 
         {/* Tabs */}
         <div className="lb-tabs">
@@ -82,19 +154,18 @@ export default function Leaderboard({ show, st, lvl, lbTab, setLbTab, user }) {
         ) : (
           <div className="lb-list">
             {sorted.slice(0, 20).map((p, i) => {
-              const isMe = p.user_id === myId;
+              const isMe = user && p.user_id === myId;
               return (
                 <div key={p.user_id} className={`lb-item${isMe ? ' me' : ''}`}>
                   <div className={`lb-rank ${rankCls[i] || ''}`}>{medals[i] || i + 1}</div>
                   <div className="lb-info">
                     <div className="lb-name">
                       {getDisplayName(p)}{isMe ? ' (you)' : ''}
-                      {p.is_guest
-                        ? <span className="lb-badge guest">Guest</span>
-                        : <span className="lb-badge google">Google</span>}
                     </div>
                     <div className="lb-sub">
-                      {lbTab === 'xp' ? `Best score: ${p.best_score || 0}/10` : `${p.xp} XP total`}
+                      {lbTab === 'xp'
+                        ? `Best score: ${p.best_score || 0}/10`
+                        : `${p.xp} XP total`}
                     </div>
                   </div>
                   <div className={`lb-val${lbTab === 'xp' ? ' green' : ''}`}>
@@ -103,6 +174,9 @@ export default function Leaderboard({ show, st, lvl, lbTab, setLbTab, user }) {
                 </div>
               );
             })}
+            {sorted.length === 0 && (
+              <div className="lb-loading">No players yet — be the first! 🏆</div>
+            )}
           </div>
         )}
       </div>
