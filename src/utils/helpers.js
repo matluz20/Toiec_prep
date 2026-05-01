@@ -120,7 +120,6 @@ export function buildRevisionPool(CATS) {
       const fullWord = allWords.find((w) => w.w === item.word);
       if (!fullWord) return;
       const wrongDefs = allDefs.filter((d) => d !== fullWord.d).sort(() => Math.random() - 0.5).slice(0, 3);
-      const wrongWords = allWordsList.filter((w) => w !== fullWord.w).sort(() => Math.random() - 0.5).slice(0, 3);
       pool.push({
         word: fullWord.w, type: 'mcq',
         q: `What does "${fullWord.w}" mean?`,
