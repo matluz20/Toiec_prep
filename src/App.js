@@ -167,6 +167,16 @@ export default function App() {
     show('quiz');
   }
 
+  const [darkMode, setDarkMode] = useState(() => {
+  return localStorage.getItem('toeic_dark') === 'true';
+    });
+  useEffect(() => {
+    document.body.classList.toggle('dark', darkMode);
+    localStorage.setItem('toeic_dark', darkMode);
+  }, [darkMode]);
+
+
+
   function startRevision() {
   const pool = buildRevisionPool(CATS);
   if (!pool.length) {
@@ -350,6 +360,7 @@ function startReversedQuiz() {
     startCategoryQuiz,
     startSuddenDeath,
     startReversedQuiz,
+    darkMode, setDarkMode,
   };
 
     if (showSplash) {

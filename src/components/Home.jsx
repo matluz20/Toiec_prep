@@ -6,7 +6,7 @@ export default function Home({
   startQuiz, startChallenge,startRevision,
   user, handleGoogleLogin, handleSignOut,startCategoryQuiz,
   startSuddenDeath,
-  startReversedQuiz,
+  startReversedQuiz,darkMode, setDarkMode,
 }) {
   const [wodOpen, setWodOpen] = useState(false);
   const [wod, setWod] = useState(null);
@@ -29,6 +29,12 @@ export default function Home({
       <div className="home-top">
         <div className="logo">TOEIC Prep</div>
         <div className="top-right">
+          <button
+            className="dark-toggle"
+            onClick={() => setDarkMode(!darkMode)}
+          >
+            {darkMode ? '☀️' : '🌙'}
+          </button>
           {user ? (
             <div className="user-pill">
               <img src={user.user_metadata?.avatar_url} alt="avatar" className="user-avatar" />
@@ -45,6 +51,8 @@ export default function Home({
               </svg>
               Sign in
             </button>
+            
+            
           )}
           <button className="lb-btn" onClick={() => show('leaderboard')}>🏆</button>
           <div className="streak-pill">🔥 {st.streak}</div>
