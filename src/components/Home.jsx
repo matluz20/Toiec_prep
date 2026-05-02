@@ -105,9 +105,9 @@ export default function Home({
 
       {/* Modes */}
 
-<div className="coming-soon-strip" onClick={() => alert('🔜 TOEIC Simulator coming soon!')}>
+<div className="coming-soon-strip" onClick={() => alert('🔜 TOEIC Simulator coming soon !')}>
   <span className="coming-soon-strip-icon">🏅</span>
-  <span className="coming-soon-strip-text">TOEIC Simulator — 100 questions · score 300–990</span>
+  <span className="coming-soon-strip-text">TOEIC Simulator — 200 questions · score 300–990</span>
   <span className="coming-soon-strip-badge">Soon</span>
 </div>
 
