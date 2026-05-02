@@ -104,6 +104,14 @@ export default function Home({
 
 
       {/* Modes */}
+
+<div className="coming-soon-strip" onClick={() => alert('🔜 TOEIC Simulator coming soon!')}>
+  <span className="coming-soon-strip-icon">🏅</span>
+  <span className="coming-soon-strip-text">TOEIC Simulator — 100 questions · score 300–990</span>
+  <span className="coming-soon-strip-badge">Soon</span>
+</div>
+
+
 <div className="sec-title">Training modes</div>
 <div className="mode-grid">
   <div className="mode-card" onClick={() => show('vocab')}>
@@ -131,6 +139,9 @@ export default function Home({
       {st.challengeDone ? '✓ done' : 'available'}
     </div>
   </div>
+
+
+
   <div className="mode-card" onClick={startRevision}>
     <div className="mode-ic ic-purple">📖</div>
     <div className="mode-lbl">Revision</div>

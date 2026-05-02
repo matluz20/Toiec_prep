@@ -860,10 +860,25 @@ body.dark { background: #0e0e11; }
 
 /* Hint in quiz */
 .hint-cost { font-size: 10px; color: var(--text-faint); margin-left: 3px; }
-
-
-
-
+/* COMING SOON STRIP */
+.coming-soon-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 1.25rem 0.75rem;
+  padding: 0.6rem 0.875rem;
+  background: linear-gradient(135deg, var(--bg-card), #FFF8E6);
+  border: 1px dashed #BA7517;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: opacity .15s;
+  opacity: 0.85;
+}
+.app.dark .coming-soon-strip { background: linear-gradient(135deg, var(--bg-card), #2a1e08); border-color: #6b4508; }
+.coming-soon-strip:hover { opacity: 1; }
+.coming-soon-strip-icon { font-size: 16px; }
+.coming-soon-strip-text { flex: 1; font-size: 12px; font-weight: 500; color: var(--text); }
+.coming-soon-strip-badge { font-size: 10px; font-weight: 700; color: #BA7517; background: #FAEEDA; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
 
 /* ── RESPONSIVE ────────────────────────────────────────── */
 @media (max-width: 480px) {
