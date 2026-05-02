@@ -122,7 +122,7 @@ export default function Quiz({
   const isSuddenDeath = quizTitle.includes('Sudden');
 
   const typeConfig = {
-    mcq: { label: 'Multiple choice', color: '#185FA5', bg: 'var(--blue-bg)', emoji: '🎯' },
+    mcq: { label: 'Choose the answer', color: '#185FA5', bg: 'var(--blue-bg)', emoji: '🎯' },
     flash: { label: 'Flashcard', color: '#854F0B', bg: 'var(--amber-bg)', emoji: '⚡' },
     fill: { label: 'Fill in the blank', color: '#0F6E56', bg: 'var(--green-bg)', emoji: '✏️' },
     write: { label: 'Write the word', color: '#993C1D', bg: 'var(--coral-bg)', emoji: '📝' },
