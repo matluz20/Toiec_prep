@@ -27,7 +27,7 @@ export default function Home({
     <div>
       {/* Header */}
       <div className="home-top">
-        <div className="logo">SONIA BOSS</div>
+        <div className="logo">TOEIC Prep</div>
         <div className="top-right">
           <button
             className="dark-toggle"
