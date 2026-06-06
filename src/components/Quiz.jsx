@@ -164,7 +164,7 @@ export default function Quiz({
         </div>
       </div>
 
-      <div className="qwrap">
+      <div className="qwrap" key={qIdx}>
         {/* Top row — counter + timer */}
         <div className="quiz-meta-row">
           <div className="quiz-counter">

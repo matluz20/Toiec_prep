@@ -185,7 +185,11 @@ body.dark { background: #0e0e11; }
 .locked-vi-h { font-size: 10px; color: var(--text-faint); margin-top: 2px; }
 
 /* ── QUIZ ──────────────────────────────────────────────── */
-.qwrap { padding: 1.1rem 1.25rem; }
+.qwrap { padding: 1.1rem 1.25rem; animation: questionIn 0.22s ease; }
+@keyframes questionIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 .qpbar { height: 5px; background: var(--bg-secondary); border-radius: 3px; margin-bottom: 1.25rem; overflow: hidden; }
 .qpfill { height: 100%; background: linear-gradient(90deg, #1D9E75, #25c89a); border-radius: 3px; transition: width .3s; }
 .q-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
