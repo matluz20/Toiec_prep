@@ -283,7 +283,7 @@ export default function Quiz({
               onChange={(e) => setWriteVal(e.target.value)}
               disabled={writeChecked}
               onKeyDown={(e) => { if (e.key === 'Enter') handleWrite(); }}
-              autoFocus
+              autoComplete="off"
             />
             <button className="write-submit" onClick={handleWrite} disabled={writeChecked}>
               Check →
