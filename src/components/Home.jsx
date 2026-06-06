@@ -62,7 +62,7 @@ export default function Home({
       {/* Word of the moment */}
       {wod && (
         <div className={`wod${wodOpen ? ' open' : ''}`} onClick={() => setWodOpen(!wodOpen)}>
-          <div className="wod-badge">Word of the moment ↺</div>
+          <div className="wod-badge">{wodOpen ? 'Word of the day ↑ tap to close' : 'Word of the day · tap to expand'}</div>
           <div className="wod-row">
             <span className="wod-word">{wod.w}</span>
             <div className="wod-actions">
@@ -106,16 +106,16 @@ export default function Home({
       {/* CTA principal */}
       {st.quizzes === 0 && (
         <div className="home-cta-wrap">
-          <div className="home-cta-label">👋 Nouveau par ici ?</div>
+          <div className="home-cta-label">👋 New here?</div>
           <button className="home-cta-btn" onClick={() => startQuiz(false)}>
             <span className="home-cta-icon">⚡</span>
             <span className="home-cta-text">
-              <span className="home-cta-title">Lancer mon premier quiz</span>
-              <span className="home-cta-sub">Mixed Quiz · MCQ + flashcards · +5 XP par bonne réponse</span>
+              <span className="home-cta-title">Start my first quiz</span>
+              <span className="home-cta-sub">Mixed Quiz · MCQ + flashcards · +5 XP per correct answer</span>
             </span>
             <span className="home-cta-arrow">→</span>
           </button>
-          <p className="home-cta-hint">ou explore le vocabulaire d'abord ↓</p>
+          <p className="home-cta-hint">or explore vocabulary first ↓</p>
         </div>
       )}
 
@@ -137,7 +137,7 @@ export default function Home({
   </div>
   <div className="mode-card hl" onClick={() => startQuiz(false)}>
     <div className="mode-ic ic-teal">⚡</div>
-    <div className="mode-lbl">Mixed quiz {st.quizzes === 0 && <span className="mode-start-here">Commence ici</span>}</div>
+    <div className="mode-lbl">Mixed quiz {st.quizzes === 0 && <span className="mode-start-here">Start here</span>}</div>
     <div className="mode-desc">MCQ + flashcard + fill in + write</div>
     <div className="mbadge mb-teal">+5 XP per correct</div>
   </div>
@@ -155,6 +155,7 @@ export default function Home({
       {st.challengeDone ? '✓ done' : 'available'}
     </div>
   </div>
+
 
 
   <div className="mode-card" onClick={startSuddenDeath}>
@@ -185,6 +186,23 @@ export default function Home({
             </div>
           );
         })}
+      </div>
+
+      {/* Revision */}
+      <div className="sec-title" style={{ marginTop: '1rem' }}>Revision</div>
+      <div style={{ padding: '0 1.25rem 1.5rem' }}>
+        <div className="mode-card" onClick={startRevision} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="mode-ic ic-purple" style={{ margin: 0 }}>📖</div>
+          <div style={{ flex: 1 }}>
+            <div className="mode-lbl">Revision</div>
+            <div className="mode-desc">Review your missed words</div>
+          </div>
+          <div className="mbadge mb-purple">
+            {JSON.parse(localStorage.getItem('toeic_missed_words') || '[]').length > 0
+              ? `${JSON.parse(localStorage.getItem('toeic_missed_words')).length} words to review`
+              : 'No words yet'}
+          </div>
+        </div>
       </div>
     </div>
   );
