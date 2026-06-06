@@ -157,17 +157,6 @@ export default function Home({
   </div>
 
 
-
-  <div className="mode-card" onClick={startRevision}>
-    <div className="mode-ic ic-purple">📖</div>
-    <div className="mode-lbl">Revision</div>
-    <div className="mode-desc">Review your missed words</div>
-    <div className="mbadge mb-purple">
-      {JSON.parse(localStorage.getItem('toeic_missed_words') || '[]').length > 0
-        ? `${JSON.parse(localStorage.getItem('toeic_missed_words')).length} words to review`
-        : 'No words yet'}
-    </div>
-  </div>
   <div className="mode-card" onClick={startSuddenDeath}>
     <div className="mode-ic ic-red">💀</div>
     <div className="mode-lbl">Sudden Death</div>
