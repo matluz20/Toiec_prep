@@ -464,6 +464,14 @@ body.dark { background: #0e0e11; }
 
 /* ── GAMIFIED QUIZ ─────────────────────────────────────── */
 .quiz-screen { min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
+.quiz-screen.type-mcq   { background: linear-gradient(160deg, #ddeeff 0%, var(--bg) 35%); }
+.quiz-screen.type-flash { background: linear-gradient(160deg, #faeeda 0%, var(--bg) 35%); }
+.quiz-screen.type-write { background: linear-gradient(160deg, #d6f5eb 0%, var(--bg) 35%); }
+.quiz-screen.type-fill  { background: linear-gradient(160deg, #d6f5eb 0%, var(--bg) 35%); }
+.app.dark .quiz-screen.type-mcq   { background: linear-gradient(160deg, #0d1e30 0%, var(--bg) 40%); }
+.app.dark .quiz-screen.type-flash { background: linear-gradient(160deg, #2a1e08 0%, var(--bg) 40%); }
+.app.dark .quiz-screen.type-write { background: linear-gradient(160deg, #0d2e21 0%, var(--bg) 40%); }
+.app.dark .quiz-screen.type-fill  { background: linear-gradient(160deg, #0d2e21 0%, var(--bg) 40%); }
 
 /* Quiz Header */
 .quiz-header {

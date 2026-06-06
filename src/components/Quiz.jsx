@@ -133,7 +133,7 @@ export default function Quiz({
   const timerColor = timeLeft > 10 ? '#1D9E75' : timeLeft > 5 ? '#BA7517' : '#D85A30';
 
   return (
-    <div className="quiz-screen">
+    <div className={`quiz-screen type-${q.type}`}>
       {/* Header */}
       <div className="quiz-header">
         <button className="quiz-back" onClick={() => show('home')}>←</button>
