@@ -25,6 +25,7 @@ export default function Quiz({
   const q = questions[qIdx];
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
     setHintUsed(false);
     setHintVisible(false);
     setAnswered(false);
