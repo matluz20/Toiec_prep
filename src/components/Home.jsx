@@ -103,6 +103,22 @@ export default function Home({
       
 
 
+      {/* CTA principal */}
+      {st.quizzes === 0 && (
+        <div className="home-cta-wrap">
+          <div className="home-cta-label">👋 Nouveau par ici ?</div>
+          <button className="home-cta-btn" onClick={() => startQuiz(false)}>
+            <span className="home-cta-icon">⚡</span>
+            <span className="home-cta-text">
+              <span className="home-cta-title">Lancer mon premier quiz</span>
+              <span className="home-cta-sub">Mixed Quiz · MCQ + flashcards · +5 XP par bonne réponse</span>
+            </span>
+            <span className="home-cta-arrow">→</span>
+          </button>
+          <p className="home-cta-hint">ou explore le vocabulaire d'abord ↓</p>
+        </div>
+      )}
+
       {/* Modes */}
 
 <div className="coming-soon-strip" onClick={() => alert('🔜 TOEIC Simulator coming soon !')}>
@@ -121,7 +137,7 @@ export default function Home({
   </div>
   <div className="mode-card hl" onClick={() => startQuiz(false)}>
     <div className="mode-ic ic-teal">⚡</div>
-    <div className="mode-lbl">Mixed quiz</div>
+    <div className="mode-lbl">Mixed quiz {st.quizzes === 0 && <span className="mode-start-here">Commence ici</span>}</div>
     <div className="mode-desc">MCQ + flashcard + fill in + write</div>
     <div className="mbadge mb-teal">+5 XP per correct</div>
   </div>

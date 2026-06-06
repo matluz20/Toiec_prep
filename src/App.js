@@ -4,6 +4,7 @@ import { CATS, LEVELS, BADGES } from './data/words';
 import { getLvl, getWPC, getUnlockedCount, speak, buildPool, buildRevisionPool, saveProgress, loadProgress, updateStreak } from './utils/helpers';
 import { supabase, signInWithGoogle, signOut, saveProgressToCloud, loadProgressFromCloud } from './supabase';
 import Home from './components/Home';
+import Onboarding from './components/Onboarding';
 import Vocab from './components/Vocab';
 import VocabList from './components/VocabList';
 import Quiz from './components/Quiz';
@@ -332,30 +333,7 @@ export default function App() {
   if (showSplash) {
     return (
       <div className={`app${darkMode ? ' dark' : ''}`}>
-        <div className="splash">
-          <div className="splash-content">
-            <div className="splash-logo">TOEIC Prep</div>
-            <div className="splash-emoji">🎯</div>
-            <h1 className="splash-title">Prépare ton TOEIC<br />sans stress</h1>
-            <p className="splash-desc">
-              Vocabulaire essentiel, quiz variés et système
-              de progression pour maximiser ton score.
-            </p>
-            <div className="splash-features">
-              <div className="splash-feat">📚 500+ mots TOEIC</div>
-              <div className="splash-feat">⚡ Quiz interactifs</div>
-              <div className="splash-feat">🏆 Classement mondial</div>
-              <div className="splash-feat">☁️ Progression sauvegardée</div>
-            </div>
-            <button
-              className="splash-btn"
-              onClick={() => { localStorage.setItem('toeic_visited', 'true'); setShowSplash(false); }}
-            >
-              Commencer gratuitement →
-            </button>
-            <p className="splash-note">Aucune inscription requise pour commencer</p>
-          </div>
-        </div>
+        <Onboarding onDone={() => { localStorage.setItem('toeic_visited', 'true'); setShowSplash(false); }} />
       </div>
     );
   }
