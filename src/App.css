@@ -1173,6 +1173,7 @@ body.dark { background: #0e0e11; }
 .listen-home-card {
   flex-shrink: 0;
   width: 160px;
+  min-height: 110px;
   background: var(--bg-card);
   border: 0.5px solid var(--border);
   border-radius: 14px;
