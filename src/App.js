@@ -5,6 +5,7 @@ import { getLvl, getWPC, getUnlockedCount, speak, buildPool, buildRevisionPool, 
 import { supabase, signInWithGoogle, signOut, saveProgressToCloud, loadProgressFromCloud } from './supabase';
 import Home from './components/Home';
 import Onboarding from './components/Onboarding';
+import Listen from './components/Listen';
 import Vocab from './components/Vocab';
 import VocabList from './components/VocabList';
 import Quiz from './components/Quiz';
@@ -363,6 +364,7 @@ export default function App() {
     { id: 'revision', icon: '📖', label: 'Revision' },
     { id: 'death', icon: '💀', label: 'Sudden Death' },
     { id: 'reversed', icon: '🔄', label: 'Reversed' },
+    { id: 'listen', icon: '🎧', label: 'Listen' },
     { id: 'leaderboard', icon: '🏆', label: 'Rankings' },
   ];
 
@@ -374,6 +376,7 @@ export default function App() {
     revision: startRevision,
     death: startSuddenDeath,
     reversed: startReversedQuiz,
+    listen: () => show('listen'),
     leaderboard: () => show('leaderboard'),
   };
 
@@ -385,6 +388,7 @@ export default function App() {
     revision: false,
     death: false,
     reversed: false,
+    listen: screen === 'listen',
     leaderboard: screen === 'leaderboard',
   };
 
@@ -396,6 +400,7 @@ export default function App() {
       {screen === 'quiz' && <Quiz {...props} />}
       {screen === 'result' && <Result {...props} />}
       {screen === 'leaderboard' && <Leaderboard {...props} />}
+      {screen === 'listen' && <Listen show={show} isPremium={st.isPremium || false} />}
 
       {screen !== 'quiz' && (
         <>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { EPISODES } from '../data/listenData';
 
 export default function Home({
   st, show, speak, CATS, LEVELS, BADGES,
@@ -173,6 +174,32 @@ export default function Home({
 </div>
 
 
+
+      {/* Listen & Learn */}
+      <div className="listen-home-section">
+        <div className="listen-home-header">
+          <div className="sec-title" style={{ margin: 0 }}>🎧 Listen & Learn</div>
+          <button className="listen-see-all" onClick={() => show('listen')}>See all →</button>
+        </div>
+        <div className="listen-home-scroll">
+          {EPISODES.slice(0, 4).map((ep) => (
+            <div
+              key={ep.id}
+              className={`listen-home-card${ep.premium ? ' premium' : ''}`}
+              onClick={() => ep.premium ? null : show('listen')}
+            >
+              <div className="listen-home-card-top">
+                <span className="listen-home-source">{ep.source} · {ep.duration}</span>
+                <span className="listen-home-count">{ep.words.length} words</span>
+              </div>
+              <div className="listen-home-card-title">{ep.title}</div>
+              <div className={`listen-home-play${ep.premium ? ' locked' : ''}`}>
+                {ep.premium ? '🔒 Premium' : '▶ Play'}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Badges */}
       <div className="sec-title" style={{ marginTop: '0.25rem' }}>My badges</div>
