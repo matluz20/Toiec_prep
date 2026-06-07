@@ -1162,17 +1162,19 @@ body.dark { background: #0e0e11; }
 }
 .listen-home-scroll {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   overflow-x: auto;
-  padding: 4px 1.25rem 12px;
+  padding: 4px 1.25rem 12px 1.25rem;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   align-items: flex-start;
+  margin: 0;
 }
 .listen-home-scroll::-webkit-scrollbar { display: none; }
 .listen-home-card {
   flex-shrink: 0;
-  width: 160px;
+  width: calc(50vw - 1.75rem);
+  max-width: 180px;
   min-height: 110px;
   background: var(--bg-card);
   border: 0.5px solid var(--border);
