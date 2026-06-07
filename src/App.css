@@ -1457,3 +1457,52 @@ body.dark { background: #0e0e11; }
   display: block;
   text-align: center;
 }
+
+/* Listen audio placeholder */
+.listen-audio-soon {
+  background: var(--bg-secondary);
+  border: 0.5px dashed var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+/* ── LISTEN COMING SOON ──────────────────────────────────── */
+.listen-coming-soon-wrap {
+  position: relative;
+  padding: 0 1.25rem 6rem;
+}
+.listen-coming-soon-banner {
+  background: var(--bg-card);
+  border: 0.5px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  z-index: 2;
+  position: relative;
+}
+.listen-coming-soon-icon { font-size: 36px; margin-bottom: 8px; }
+.listen-coming-soon-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.listen-coming-soon-sub {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.listen-coming-soon-blur {
+  filter: blur(3px);
+  opacity: 0.4;
+  pointer-events: none;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

@@ -54,8 +54,14 @@ export default function Listen({ show, isPremium }) {
         </div>
       )}
 
-      {/* Episodes list */}
-      <div className="listen-list">
+      {/* Coming soon overlay */}
+      <div className="listen-coming-soon-wrap">
+        <div className="listen-coming-soon-banner">
+          <div className="listen-coming-soon-icon">🎧</div>
+          <div className="listen-coming-soon-title">Audio episodes coming soon</div>
+          <div className="listen-coming-soon-sub">We're preparing high-quality English listening content. Check back soon!</div>
+        </div>
+        <div className="listen-coming-soon-blur">
         {filtered.map((ep) => {
           const locked = ep.premium && !isPremium;
           const isOpen = openEp === ep.id;
@@ -106,14 +112,28 @@ export default function Listen({ show, isPremium }) {
                       ))}
                     </div>
                   </div>
+                  {ep.audioUrl ? (
+                    <audio
+                      controls
+                      src={ep.audioUrl}
+                      style={{ width: '100%', borderRadius: 10, marginTop: 4 }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Your browser does not support audio.
+                    </audio>
+                  ) : (
+                    <div className="listen-audio-soon">
+                      🎧 Audio episodes coming soon — stay tuned!
+                    </div>
+                  )}
                   <a
-                    href={ep.url}
+                    href={ep.pageUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="listen-open-btn"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    Open on {ep.source} →
+                    View transcript →
                   </a>
                 </div>
               )}
@@ -121,6 +141,7 @@ export default function Listen({ show, isPremium }) {
           );
         })}
       </div>
+      </div>{/* end listen-coming-soon-wrap */}
 
       {/* Locked modal */}
       {openEp === 'locked' && (
