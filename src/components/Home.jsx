@@ -186,7 +186,7 @@ export default function Home({
             <div
               key={ep.id}
               className={`listen-home-card${ep.premium ? ' premium' : ''}`}
-              onClick={() => ep.premium ? null : show('listen')}
+              onClick={(e) => { e.preventDefault(); if (!ep.premium) show('listen'); }}
             >
               <div className="listen-home-card-top">
                 <span className="listen-home-source">{ep.source} · {ep.duration}</span>

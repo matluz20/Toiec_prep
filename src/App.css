@@ -1167,6 +1167,7 @@ body.dark { background: #0e0e11; }
   padding: 4px 1.25rem 12px;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+  align-items: flex-start;
 }
 .listen-home-scroll::-webkit-scrollbar { display: none; }
 .listen-home-card {
