@@ -95,10 +95,13 @@ export default function App() {
       setLoadingAuth(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
         setUser(session.user);
-        syncFromCloud(session.user);
+        // Only re-sync on a real sign-in, not on token refreshes or tab focus
+        if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+          syncFromCloud(session.user);
+        }
       } else {
         setUser(null);
       }
@@ -109,12 +112,25 @@ export default function App() {
 
   async function syncFromCloud(googleUser) {
     const data = await loadProgressFromCloud(googleUser.id);
+    const local = loadProgress() || INITIAL_STATE;
     if (data) {
       const cloudSt = stateFromCloud(data);
-      setSt(cloudSt);
-      saveProgress(cloudSt);
+      // Keep the most advanced progress — never let a stale cloud value erase local gains
+      const merged = {
+        ...cloudSt,
+        xp: Math.max(cloudSt.xp || 0, local.xp || 0),
+        quizzes: Math.max(cloudSt.quizzes || 0, local.quizzes || 0),
+        streak: Math.max(cloudSt.streak || 0, local.streak || 0),
+        bestScore: Math.max(cloudSt.bestScore || 0, local.bestScore || 0) || null,
+        perfectScores: Math.max(cloudSt.perfectScores || 0, local.perfectScores || 0),
+        fastAnswers: Math.max(cloudSt.fastAnswers || 0, local.fastAnswers || 0),
+        earnedBadges: Array.from(new Set([...(cloudSt.earnedBadges || []), ...(local.earnedBadges || [])])),
+      };
+      setSt(merged);
+      saveProgress(merged);
+      // Push the merged (higher) values back to the cloud
+      await saveProgressToCloud(googleUser.id, stateToCloud(merged), false);
     } else {
-      const local = loadProgress() || INITIAL_STATE;
       const merged = { ...local, username: null, promptShown: true };
       setSt(merged);
       saveProgress(merged);
