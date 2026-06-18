@@ -129,11 +129,13 @@ export default function Home({
       <div className="sec-title">Start learning</div>
       <div className="mode-grid">
         <div className="mode-card" onClick={() => show('vocab')}>
+          <span className="mode-watermark">📚</span>
           <div className="mode-ic ic-blue">📚</div>
           <div className="mode-lbl">Vocabulary</div>
           <div className="mode-desc">Learn & unlock new words</div>
         </div>
         <div className="mode-card hl" onClick={() => startQuiz(false)}>
+          <span className="mode-watermark">⚡</span>
           <div className="mode-ic ic-teal">⚡</div>
           <div className="mode-lbl">Mixed quiz {st.quizzes === 0 && <span className="mode-start-here">Start here</span>}</div>
           <div className="mode-desc">Practice all question types</div>
@@ -158,18 +160,21 @@ export default function Home({
       <div className="sec-title" style={{ marginTop: '0.75rem' }}>Challenge yourself</div>
       <div className="mode-grid">
         <div className="mode-card" onClick={() => startQuiz(true)}>
+          <span className="mode-watermark">⏱️</span>
           <div className="mode-ic ic-amber">⏱️</div>
           <div className="mode-lbl">Speed mode</div>
           <div className="mode-desc">Fast answers = bonus XP</div>
           <div className="mbadge mb-amber">+bonus under 10s</div>
         </div>
         <div className="mode-card" onClick={startSuddenDeath}>
+          <span className="mode-watermark">💀</span>
           <div className="mode-ic ic-red">💀</div>
           <div className="mode-lbl">Sudden Death</div>
           <div className="mode-desc">One wrong answer = game over</div>
           <div className="mbadge mb-red">How far can you go?</div>
         </div>
         <div className="mode-card" onClick={startReversedQuiz}>
+          <span className="mode-watermark">🔄</span>
           <div className="mode-ic ic-purple">🔄</div>
           <div className="mode-lbl">Reversed</div>
           <div className="mode-desc">French → find the English word</div>
