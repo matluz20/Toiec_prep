@@ -62,7 +62,20 @@ export default function Home({
         </div>
       </div>
 
-      {/* Due today banner — top priority for retention */}
+      {/* Today's session — the hero CTA, first thing new users see */}
+      <div className="session-card" onClick={startDailySession}>
+        <div className="session-card-glow" />
+        <div className="session-card-content">
+          <div className="session-card-label">🎯 Today's session</div>
+          <div className="session-card-title">Your personalized TOEIC review</div>
+          <div className="session-card-sub">
+            {dueCount > 0 ? `${dueCount} to review · ` : ''}new words · grammar practice
+          </div>
+          <div className="session-card-btn">Start now →</div>
+        </div>
+      </div>
+
+      {/* Due today banner */}
       {dueCount > 0 && (
         <div className="due-banner" onClick={startRevision}>
           <div className="due-banner-left">
@@ -79,20 +92,23 @@ export default function Home({
       {/* Daily goal ring */}
       <DailyGoalRing onClick={startDailySession} />
 
-      {/* Today's session — the hero CTA */}
-      <div className="session-card" onClick={startDailySession}>
-        <div className="session-card-glow" />
-        <div className="session-card-content">
-          <div className="session-card-label">🎯 Today's session</div>
-          <div className="session-card-title">Your personalized TOEIC review</div>
-          <div className="session-card-sub">
-            {dueCount > 0 ? `${dueCount} to review · ` : ''}new words · grammar practice
-          </div>
-          <div className="session-card-btn">Start now →</div>
+      {/* Level bar */}
+      <div className="lvl-wrap">
+        <div className="lvl-top">
+          <span className="lvl-name">Level {lvl + 1} — {cur.name}</span>
+          <span className="lvl-xp">{st.xp} XP</span>
+        </div>
+        <div className="lvl-bar">
+          <div className="lvl-fill" style={{ width: `${pct}%` }} />
+        </div>
+        <div className="lvl-hint">
+          {nxt
+            ? `+${nxt.xp - st.xp} XP → unlock ${(nxt.wpc - cur.wpc) * Object.keys(CATS).length} new words`
+            : 'Maximum level reached!'}
         </div>
       </div>
 
-      {/* Word of the moment */}
+      {/* Word of the day */}
       {wod && (
         <div className={`wod${wodOpen ? ' open' : ''}`} onClick={() => setWodOpen(!wodOpen)}>
           <div className="wod-badge">{wodOpen ? 'Word of the day ↑ tap to close' : 'Word of the day · tap to expand'}</div>
@@ -109,110 +125,60 @@ export default function Home({
         </div>
       )}
 
-      {/* Level bar */}
-      <div className="lvl-wrap">
-        <div className="lvl-top">
-          <span className="lvl-name">Level {lvl + 1} — {cur.name}</span>
-          <span className="lvl-xp">{st.xp} XP</span>
+      {/* Start learning */}
+      <div className="sec-title">Start learning</div>
+      <div className="mode-grid">
+        <div className="mode-card" onClick={() => show('vocab')}>
+          <div className="mode-ic ic-blue">📚</div>
+          <div className="mode-lbl">Vocabulary</div>
+          <div className="mode-desc">Learn & unlock new words</div>
         </div>
-        <div className="lvl-bar">
-          <div className="lvl-fill" style={{ width: `${pct}%` }} />
-        </div>
-        <div className="lvl-hint">
-          {nxt
-            ? `+${nxt.xp - st.xp} XP → unlock ${(nxt.wpc - cur.wpc) * Object.keys(CATS).length} new words (Level ${lvl + 2} — ${nxt.name})`
-            : 'Maximum level reached — all 96 words unlocked!'}
+        <div className="mode-card hl" onClick={() => startQuiz(false)}>
+          <div className="mode-ic ic-teal">⚡</div>
+          <div className="mode-lbl">Mixed quiz {st.quizzes === 0 && <span className="mode-start-here">Start here</span>}</div>
+          <div className="mode-desc">Practice all question types</div>
+          <div className="mbadge mb-teal">+5 XP per correct</div>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="stats-row">
-        <div className="stat-box"><div className="stat-num">{unlockedCount}</div><div className="stat-lbl">unlocked</div></div>
-        <div className="stat-box"><div className="stat-num">500</div><div className="stat-lbl">total words</div></div>
-        <div className="stat-box"><div className="stat-num">{st.bestScore !== null ? `${st.bestScore}/10` : '—'}</div><div className="stat-lbl">best score</div></div>
-        <div className="stat-box"><div className="stat-num">{st.earnedBadges.length}</div><div className="stat-lbl">badges</div></div>
+      {/* Exam practice */}
+      <div className="sec-title" style={{ marginTop: '0.75rem' }}>Exam practice</div>
+      <div style={{ padding: '0 1.25rem' }}>
+        <div className="exam-strip" style={{ margin: 0 }} onClick={startExam}>
+          <span className="exam-strip-icon">🎯</span>
+          <div className="exam-strip-text">
+            <div className="exam-strip-title">TOEIC Part 5</div>
+            <div className="exam-strip-sub">Real exam format · with explanations</div>
+          </div>
+          <span className="exam-strip-arrow">→</span>
+        </div>
       </div>
 
-      
-
-
-      {/* CTA principal */}
-      {st.quizzes === 0 && (
-        <div className="home-cta-wrap">
-          <div className="home-cta-label">👋 New here?</div>
-          <button className="home-cta-btn" onClick={() => startQuiz(false)}>
-            <span className="home-cta-icon">⚡</span>
-            <span className="home-cta-text">
-              <span className="home-cta-title">Start my first quiz</span>
-              <span className="home-cta-sub">Mixed Quiz · MCQ + flashcards · +5 XP per correct answer</span>
-            </span>
-            <span className="home-cta-arrow">→</span>
-          </button>
-          <p className="home-cta-hint">or explore vocabulary first ↓</p>
+      {/* Challenge yourself */}
+      <div className="sec-title" style={{ marginTop: '0.75rem' }}>Challenge yourself</div>
+      <div className="mode-grid">
+        <div className="mode-card" onClick={() => startQuiz(true)}>
+          <div className="mode-ic ic-amber">⏱️</div>
+          <div className="mode-lbl">Speed mode</div>
+          <div className="mode-desc">Fast answers = bonus XP</div>
+          <div className="mbadge mb-amber">+bonus under 10s</div>
         </div>
-      )}
-
-      {/* Modes */}
-
-<div className="exam-strip" onClick={startExam}>
-  <span className="exam-strip-icon">🎯</span>
-  <div className="exam-strip-text">
-    <div className="exam-strip-title">TOEIC Part 5 · Exam Practice</div>
-    <div className="exam-strip-sub">Real exam format · with explanations</div>
-  </div>
-  <span className="exam-strip-arrow">→</span>
-</div>
-
-
-<div className="sec-title">Learn & practice</div>
-<div className="mode-grid">
-  <div className="mode-card" onClick={() => show('vocab')}>
-    <div className="mode-ic ic-blue">📚</div>
-    <div className="mode-lbl">Vocabulary</div>
-    <div className="mode-desc">Unlock words as you level up</div>
-  </div>
-  <div className="mode-card hl" onClick={() => startQuiz(false)}>
-    <div className="mode-ic ic-teal">⚡</div>
-    <div className="mode-lbl">Mixed quiz {st.quizzes === 0 && <span className="mode-start-here">Start here</span>}</div>
-    <div className="mode-desc">MCQ + flashcard + fill in + write</div>
-    <div className="mbadge mb-teal">+5 XP per correct</div>
-  </div>
-</div>
-
-<div className="sec-title" style={{ marginTop: '0.75rem' }}>Challenge yourself</div>
-<div className="mode-grid">
-  <div className="mode-card" onClick={() => startQuiz(true)}>
-    <div className="mode-ic ic-amber">⏱️</div>
-    <div className="mode-lbl">Speed mode</div>
-    <div className="mode-desc">Fast answers = bonus XP</div>
-    <div className="mbadge mb-amber">+bonus under 10s</div>
-  </div>
-  <div className="mode-card" onClick={startChallenge}>
-    <div className="mode-ic ic-coral">💪</div>
-    <div className="mode-lbl">Daily challenge</div>
-    <div className="mode-desc">5 special questions</div>
-    <div className="mbadge mb-coral" style={st.challengeDone ? { background: '#E1F5EE', color: '#0F6E56' } : {}}>
-      {st.challengeDone ? '✓ done' : 'available'}
-    </div>
-  </div>
-  <div className="mode-card" onClick={startSuddenDeath}>
-    <div className="mode-ic ic-red">💀</div>
-    <div className="mode-lbl">Sudden Death</div>
-    <div className="mode-desc">One wrong answer = game over</div>
-    <div className="mbadge mb-red">How far can you go?</div>
-  </div>
-  <div className="mode-card" onClick={startReversedQuiz}>
-    <div className="mode-ic ic-purple">🔄</div>
-    <div className="mode-lbl">Reversed</div>
-    <div className="mode-desc">French → find the English word</div>
-    <div className="mbadge mb-purple">+5 XP per correct</div>
-  </div>
-</div>
-
-
+        <div className="mode-card" onClick={startSuddenDeath}>
+          <div className="mode-ic ic-red">💀</div>
+          <div className="mode-lbl">Sudden Death</div>
+          <div className="mode-desc">One wrong answer = game over</div>
+          <div className="mbadge mb-red">How far can you go?</div>
+        </div>
+        <div className="mode-card" onClick={startReversedQuiz}>
+          <div className="mode-ic ic-purple">🔄</div>
+          <div className="mode-lbl">Reversed</div>
+          <div className="mode-desc">French → find the English word</div>
+          <div className="mbadge mb-purple">+5 XP per correct</div>
+        </div>
+      </div>
 
       {/* Badges */}
-      <div className="sec-title" style={{ marginTop: '0.25rem' }}>My badges</div>
+      <div className="sec-title" style={{ marginTop: '1rem' }}>My badges</div>
       <div className="badges-row">
         {BADGES.map((b) => {
           const earned = st.earnedBadges.includes(b.id);

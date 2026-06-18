@@ -2110,3 +2110,181 @@ body.dark { background: #0e0e11; }
 .mode-challenge .question-card { border-top-color: #D85A30; }
 .mode-revision .question-card { border-top-color: #185FA5; }
 .mode-session  .question-card { border-top-color: #1D9E75; }
+
+/* ── GOAL SETUP — polished ───────────────────────────────── */
+.goal-setup-card { position: relative; overflow: hidden; }
+
+.gs-dots {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 1.75rem;
+}
+.gs-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: all .25s;
+}
+.gs-dot.active { width: 26px; border-radius: 4px; background: var(--green); }
+.gs-dot.done { background: var(--green-border); }
+
+.gs-step { animation: gsFade .3s ease; }
+@keyframes gsFade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.gs-icon-badge {
+  width: 76px; height: 76px;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+  font-size: 36px;
+}
+.gs-icon-badge.gs-icon-success {
+  background: linear-gradient(135deg, #1D9E75, #25c89a);
+  animation: gsPop .5s ease;
+}
+@keyframes gsPop {
+  0% { transform: scale(0.7); opacity: 0; }
+  60% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.gs-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+.gs-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.gs-date {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  font-size: 16px;
+  font-family: inherit;
+  background: var(--bg-card);
+  color: var(--text);
+  outline: none;
+  margin-bottom: 0.875rem;
+  transition: border-color .15s;
+  text-align: center;
+}
+.gs-date:focus { border-color: var(--green); }
+
+.gs-days-pill {
+  display: inline-block;
+  background: var(--green-bg);
+  color: var(--green-dark);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-bottom: 1.25rem;
+  animation: gsFade .3s ease;
+}
+
+.gs-scores {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+.gs-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 1rem 0.5rem;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg-card);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color .15s, background .15s, transform .12s;
+}
+.gs-score:hover { transform: translateY(-2px); }
+.gs-score.active { transform: translateY(-2px); }
+.gs-score-emoji { font-size: 24px; }
+.gs-score-num { font-size: 20px; font-weight: 700; color: var(--text); transition: color .15s; }
+.gs-score-desc { font-size: 11px; color: var(--text-muted); }
+
+.gs-plan {
+  background: var(--bg-secondary);
+  border-radius: 16px;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1.5rem;
+}
+.gs-plan-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.75rem 0;
+  border-bottom: 0.5px solid var(--border);
+}
+.gs-plan-row:last-child { border-bottom: none; }
+.gs-plan-icon { font-size: 18px; width: 24px; text-align: center; }
+.gs-plan-label { flex: 1; text-align: left; font-size: 13px; color: var(--text-secondary); }
+.gs-plan-value { font-size: 14px; font-weight: 700; color: var(--text); }
+.gs-plan-highlight .gs-plan-label,
+.gs-plan-highlight .gs-plan-value { color: var(--green-dark); }
+.app.dark .gs-plan-highlight .gs-plan-label,
+.app.dark .gs-plan-highlight .gs-plan-value { color: #5DCAA5; }
+
+.gs-btn {
+  width: 100%;
+  padding: 0.9rem;
+  border-radius: 14px;
+  border: none;
+  background: var(--green);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .15s, transform .1s;
+  box-shadow: 0 4px 16px rgba(29,158,117,0.25);
+  margin-bottom: 0.5rem;
+}
+.gs-btn:hover { background: var(--green-dark); transform: translateY(-1px); }
+.gs-btn:disabled { opacity: .45; cursor: default; transform: none; box-shadow: none; }
+.gs-btn-final {
+  background: linear-gradient(135deg, #1D9E75, #185FA5);
+  box-shadow: 0 6px 20px rgba(29,158,117,0.35);
+}
+.gs-skip {
+  width: 100%;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+  padding: 6px;
+}
+
+/* Goal setup — coverage note */
+.gs-note {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 0.75rem 0.875rem;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+.gs-note strong { color: var(--text); font-weight: 700; }
