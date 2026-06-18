@@ -120,13 +120,33 @@ export default function Quiz({
   if (!q) return null;
 
   const pct = (qIdx / questions.length) * 100;
-  const isSuddenDeath = quizTitle.includes('Sudden');
+  // Each mode gets its own visual identity
+  const modeTheme =
+    quizTitle.includes('Sudden') ? 'death' :
+    quizTitle.includes('Speed') ? 'speed' :
+    quizTitle.includes('Reversed') ? 'reversed' :
+    quizTitle.includes('challenge') ? 'challenge' :
+    quizTitle.includes('Revision') ? 'revision' :
+    quizTitle.includes('session') ? 'session' :
+    'mixed';
+
+  const modeMeta = {
+    death:     { emoji: '💀', tag: 'Survival mode', sub: '⚠️ One mistake = game over' },
+    speed:     { emoji: '⏱️', tag: 'Beat the clock', sub: 'Answer fast for bonus XP' },
+    reversed:  { emoji: '🔄', tag: 'Reverse mode', sub: 'French → English' },
+    challenge: { emoji: '💪', tag: 'Daily challenge', sub: '5 special questions' },
+    revision:  { emoji: '📖', tag: 'Smart revision', sub: 'Words you\'re about to forget' },
+    session:   { emoji: '🎯', tag: 'Today\'s session', sub: 'Review + new + grammar' },
+    mixed:     { emoji: '⚡', tag: 'Mixed quiz', sub: 'All question types' },
+  };
+  const mm = modeMeta[modeTheme];
 
   const typeConfig = {
     mcq: { label: 'Choose the answer', color: '#185FA5', bg: 'var(--blue-bg)', emoji: '🎯' },
     flash: { label: 'Flashcard', color: '#854F0B', bg: 'var(--amber-bg)', emoji: '⚡' },
     fill: { label: 'Fill in the blank', color: '#0F6E56', bg: 'var(--green-bg)', emoji: '✏️' },
     write: { label: 'Write the word', color: '#993C1D', bg: 'var(--coral-bg)', emoji: '📝' },
+    part5: { label: 'TOEIC Part 5 · Grammar', color: '#534AB7', bg: 'var(--purple-bg)', emoji: '🎯' },
   };
   const tc = typeConfig[q.type] || typeConfig.mcq;
 
@@ -134,13 +154,23 @@ export default function Quiz({
   const timerColor = timeLeft > 10 ? '#1D9E75' : timeLeft > 5 ? '#BA7517' : '#D85A30';
 
   return (
-    <div className={`quiz-screen type-${q.type}`}>
-      {/* Header */}
-      <div className="quiz-header">
+    <div className={`quiz-screen type-${q.type} mode-${modeTheme}`}>
+      <div className="mode-decor" aria-hidden="true">
+        <span className="mode-decor-emoji mode-decor-1">{mm.emoji}</span>
+        <span className="mode-decor-emoji mode-decor-2">{mm.emoji}</span>
+        <span className="mode-decor-emoji mode-decor-3">{mm.emoji}</span>
+        <span className="mode-decor-emoji mode-decor-4">{mm.emoji}</span>
+        <span className="mode-decor-emoji mode-decor-5">{mm.emoji}</span>
+      </div>
+      {/* Mode banner */}
+      <div className="mode-banner">
         <button className="quiz-back" onClick={() => show('home')}>←</button>
-        <div className="quiz-header-center">
-          <div className="quiz-title-text">{quizTitle}</div>
-          {isSuddenDeath && <div className="sudden-death-warning">⚠️ One mistake = game over</div>}
+        <div className="mode-banner-center">
+          <div className="mode-banner-tag">
+            <span className="mode-banner-emoji">{mm.emoji}</span>
+            {mm.tag}
+          </div>
+          <div className="mode-banner-sub">{mm.sub}</div>
         </div>
         <div className="quiz-score-pill">
           <span className="quiz-score-num">{score}</span>
@@ -193,13 +223,13 @@ export default function Quiz({
           )}
         </div>
 
-        {/* Type badge */}
-        <div className="quiz-type-badge" style={{ background: tc.bg, color: tc.color }}>
-          {tc.emoji} {tc.label}
+        {/* Question card with mode accent */}
+        <div className="question-card">
+          <div className="quiz-type-badge" style={{ background: tc.bg, color: tc.color }}>
+            {tc.emoji} {tc.label}
+          </div>
+          <div className="quiz-question">{q.q}</div>
         </div>
-
-        {/* Question */}
-        <div className="quiz-question">{q.q}</div>
 
         {/* Hint */}
         <div className="hint-row">
@@ -214,7 +244,7 @@ export default function Quiz({
         </div>
 
         {/* MCQ / Fill */}
-        {(q.type === 'mcq' || q.type === 'fill') && (
+        {(q.type === 'mcq' || q.type === 'fill' || q.type === 'part5') && (
           <div className="quiz-opts">
             {q.opts.map((opt, i) => {
               let cls = 'quiz-opt';

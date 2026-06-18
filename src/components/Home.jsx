@@ -5,7 +5,7 @@ import DailyGoalRing from './DailyGoalRing';
 export default function Home({
   st, show, speak, CATS, LEVELS, BADGES,
   lvl, wpc, unlockedCount,
-  startQuiz, startChallenge,startRevision,
+  startQuiz, startChallenge,startRevision,startDailySession,
   user, handleGoogleLogin, handleSignOut,startCategoryQuiz,
   startSuddenDeath,
   startReversedQuiz,startExam,darkMode, setDarkMode,
@@ -77,7 +77,20 @@ export default function Home({
       )}
 
       {/* Daily goal ring */}
-      <DailyGoalRing onClick={() => startQuiz(false)} />
+      <DailyGoalRing onClick={startDailySession} />
+
+      {/* Today's session — the hero CTA */}
+      <div className="session-card" onClick={startDailySession}>
+        <div className="session-card-glow" />
+        <div className="session-card-content">
+          <div className="session-card-label">🎯 Today's session</div>
+          <div className="session-card-title">Your personalized TOEIC review</div>
+          <div className="session-card-sub">
+            {dueCount > 0 ? `${dueCount} to review · ` : ''}new words · grammar practice
+          </div>
+          <div className="session-card-btn">Start now →</div>
+        </div>
+      </div>
 
       {/* Word of the moment */}
       {wod && (

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { checkUsernameAvailable } from '../supabase';
+import Confetti from './Confetti';
 
 const GoogleIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" style={{ marginRight: 8, flexShrink: 0 }}>
@@ -75,6 +76,7 @@ export default function Result({
 
   return (
     <div>
+      <Confetti active={pct >= 0.8} />
       <div className="ph">
         <button className="back" onClick={() => show('home')}>←</button>
         <div><div className="ph-title">Results</div></div>

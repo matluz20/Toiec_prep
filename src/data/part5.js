@@ -110,3 +110,7 @@ export const PART5_QUESTIONS = [
     skill: 'Preposition',
   },
 ];
+
+export function shufflePart5() {
+  return [...PART5_QUESTIONS].sort(() => Math.random() - 0.5);
+}

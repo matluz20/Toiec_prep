@@ -3,6 +3,7 @@ import './App.css';
 import { CATS, LEVELS, BADGES } from './data/words';
 import { getLvl, getWPC, getUnlockedCount, speak, buildPool, saveProgress, loadProgress, updateStreak } from './utils/helpers';
 import { buildSRSPool, recordReview } from './utils/srs';
+import { shufflePart5 } from './data/part5';
 import { addDailyXP } from './utils/dailyGoal';
 import { supabase, signInWithGoogle, signOut, saveProgressToCloud, loadProgressFromCloud } from './supabase';
 import Home from './components/Home';
@@ -161,6 +162,33 @@ export default function App() {
     setQIdx(0); setScore(0); setSessionXP(0); setMissedWords([]);
     setTimerMode(!!chrono);
     setQuizTitle(chrono ? 'Speed mode ⏱️' : 'Mixed quiz ⚡');
+    show('quiz');
+  }
+
+  function startDailySession() {
+    // Smart mix: due revision words + fresh words + Part 5 grammar
+    const revisionPool = buildSRSPool(CATS).slice(0, 5);
+    const freshPool = buildPool(CATS, wpc)
+      .filter((q) => !revisionPool.some((r) => r.word === q.word))
+      .slice(0, 5);
+    const part5Pool = shufflePart5().slice(0, 3).map((p) => ({
+      type: 'part5',
+      word: null,
+      q: p.sentence,
+      opts: [...p.options].sort(() => Math.random() - 0.5),
+      correct: p.correct,
+      ex: p.why,
+      skill: p.skill,
+      part5: true,
+    }));
+
+    const session = [...revisionPool, ...freshPool, ...part5Pool];
+    if (session.length < 3) { alert('Take a quick quiz first to start your daily sessions! 💪'); return; }
+
+    setQuestions(session);
+    setQIdx(0); setScore(0); setSessionXP(0); setMissedWords([]);
+    setTimerMode(false);
+    setQuizTitle('Today\'s session 🎯');
     show('quiz');
   }
 
@@ -378,7 +406,7 @@ export default function App() {
     lbTab, setLbTab,
     startQuiz, startChallenge,
     user, handleGoogleLogin, handleSignOut,
-    startRevision, startCategoryQuiz, startSuddenDeath, startReversedQuiz, startExam,
+    startRevision, startCategoryQuiz, startSuddenDeath, startReversedQuiz, startExam, startDailySession,
     darkMode, setDarkMode,
     navItems, setNavItems, showNavEditor, setShowNavEditor,
   };
