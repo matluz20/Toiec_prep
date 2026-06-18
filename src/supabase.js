@@ -45,7 +45,6 @@ export async function saveProgressToCloud(userId, progress, isGuest = false) {
       challenge_done: progress.challenge_done,
       perfect_scores: progress.perfect_scores,
       fast_answers: progress.fast_answers,
-      srs_data: progress.srs_data || null,
       updated_at: new Date(),
     }, { onConflict: 'user_id' });
   if (error) console.error('Save error:', error);
