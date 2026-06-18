@@ -1578,3 +1578,142 @@ body.dark { background: #0e0e11; }
   border-radius: 2px;
   transition: width .5s ease;
 }
+
+/* ── DAILY GOAL RING ─────────────────────────────────────── */
+.daily-goal {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 1.25rem 0.75rem;
+  padding: 0.875rem 1rem;
+  background: var(--bg-card);
+  border: 0.5px solid var(--border);
+  border-radius: 16px;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform .15s, box-shadow .15s;
+}
+.daily-goal:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.daily-goal-ring { position: relative; width: 64px; height: 64px; flex-shrink: 0; }
+.dg-ring-bg { fill: none; stroke: var(--bg-secondary); stroke-width: 6; }
+.dg-ring-fill {
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset .6s ease;
+}
+.dg-ring-fill.met { stroke: var(--green); }
+.daily-goal-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dg-pct { font-size: 14px; font-weight: 700; color: var(--text); }
+.dg-check { font-size: 22px; color: var(--green); font-weight: 700; }
+.daily-goal-info { flex: 1; min-width: 0; }
+.daily-goal-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.daily-goal-sub { font-size: 11px; color: var(--text-secondary); line-height: 1.4; }
+
+/* ── GOAL SETUP ──────────────────────────────────────────── */
+.goal-setup-overlay {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #f9f9f7 0%, #e8f5f0 100%);
+  padding: 1.5rem;
+}
+.app.dark .goal-setup-overlay {
+  background: linear-gradient(160deg, #141418 0%, #0d2b22 100%);
+}
+.goal-setup-card {
+  max-width: 360px;
+  width: 100%;
+  background: var(--bg-card);
+  border-radius: 24px;
+  padding: 2.5rem 1.75rem 1.75rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+  border: 0.5px solid var(--border);
+  text-align: center;
+  animation: onboardIn 0.25s ease;
+}
+.goal-setup-emoji { font-size: 44px; margin-bottom: 1rem; }
+.goal-setup-title {
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.625rem;
+}
+.goal-setup-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+.goal-setup-date {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  font-size: 16px;
+  font-family: inherit;
+  background: var(--bg-card);
+  color: var(--text);
+  outline: none;
+  margin-bottom: 1.25rem;
+  transition: border-color .15s;
+}
+.goal-setup-date:focus { border-color: var(--green); }
+.goal-setup-scores {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+.goal-score-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0.875rem;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color .15s, background .15s;
+}
+.goal-score-btn.active {
+  border-color: var(--green);
+  background: var(--green-bg);
+}
+.goal-score-num { font-size: 18px; font-weight: 700; color: var(--text); }
+.goal-score-desc { font-size: 11px; color: var(--text-muted); }
+.goal-setup-btn {
+  width: 100%;
+  padding: 0.9rem;
+  border-radius: 14px;
+  border: none;
+  background: var(--green);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .15s, transform .1s;
+  box-shadow: 0 4px 16px rgba(29,158,117,0.25);
+  margin-bottom: 0.75rem;
+}
+.goal-setup-btn:hover { background: var(--green-dark); transform: translateY(-1px); }
+.goal-setup-btn:disabled { opacity: .5; cursor: default; transform: none; }
+.goal-setup-skip {
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+}

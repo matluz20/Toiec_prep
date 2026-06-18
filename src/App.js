@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { CATS, LEVELS, BADGES } from './data/words';
-import { getLvl, getWPC, getUnlockedCount, speak, buildPool, buildRevisionPool, saveProgress, loadProgress, updateStreak } from './utils/helpers';
+import { getLvl, getWPC, getUnlockedCount, speak, buildPool, saveProgress, loadProgress, updateStreak } from './utils/helpers';
+import { buildSRSPool, recordReview } from './utils/srs';
+import { addDailyXP } from './utils/dailyGoal';
 import { supabase, signInWithGoogle, signOut, saveProgressToCloud, loadProgressFromCloud } from './supabase';
 import Home from './components/Home';
 import Onboarding from './components/Onboarding';
 import Listen from './components/Listen';
+import GoalSetup from './components/GoalSetup';
+import { hasCompletedSetup } from './utils/dailyGoal';
 import Vocab from './components/Vocab';
 import VocabList from './components/VocabList';
 import Quiz from './components/Quiz';
@@ -57,6 +61,7 @@ function stateToCloud(st) {
 export default function App() {
   const [screen, setScreen] = useState('home');
   const [showSplash, setShowSplash] = useState(() => !localStorage.getItem('toeic_visited'));
+  const [showGoalSetup, setShowGoalSetup] = useState(() => localStorage.getItem('toeic_visited') && !hasCompletedSetup());
   const [st, setSt] = useState(() => loadProgress() || INITIAL_STATE);
   const [user, setUser] = useState(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
@@ -171,9 +176,9 @@ export default function App() {
   }
 
   function startRevision() {
-    const pool = buildRevisionPool(CATS);
-    if (!pool.length) { alert('No words to review yet! Complete a quiz first. 💪'); return; }
-    setQuestions(pool.slice(0, Math.min(pool.length, 10)));
+    const pool = buildSRSPool(CATS);
+    if (!pool.length) { alert('Nothing to review right now! Take a quiz and come back later. 💪'); return; }
+    setQuestions(pool.slice(0, Math.min(pool.length, 15)));
     setQIdx(0); setScore(0); setSessionXP(0); setMissedWords([]);
     setTimerMode(false);
     setQuizTitle('Revision mode 📖');
@@ -242,9 +247,11 @@ export default function App() {
   }
 
   function onAnswer({ correct, xpGained, word, def, fast, suddenDeath }) {
+    if (word) recordReview(word, correct);
     if (correct) {
       setScore((s) => s + 1);
       setSessionXP((s) => s + xpGained);
+      addDailyXP(xpGained);
       setSt((prev) => ({
         ...prev,
         xp: prev.xp + xpGained,
@@ -266,15 +273,11 @@ export default function App() {
   function onQuizEnd() {
     const finalScore = score;
     const isChallenge = quizTitle.includes('challenge');
-    const isRevision = quizTitle.includes('Revision');
     const newStreak = updateStreak(st);
 
     if (missedWords.length > 0) {
       const uniq = missedWords.filter((v, i, a) => a.findIndex((x) => x.word === v.word) === i);
       localStorage.setItem('toeic_missed_words', JSON.stringify(uniq));
-    }
-    if (isRevision) {
-      localStorage.removeItem('toeic_missed_words');
     }
 
     setSt((prev) => {
@@ -334,7 +337,15 @@ export default function App() {
   if (showSplash) {
     return (
       <div className={`app${darkMode ? ' dark' : ''}`}>
-        <Onboarding onDone={() => { localStorage.setItem('toeic_visited', 'true'); setShowSplash(false); }} />
+        <Onboarding onDone={() => { localStorage.setItem('toeic_visited', 'true'); setShowSplash(false); setShowGoalSetup(true); }} />
+      </div>
+    );
+  }
+
+  if (showGoalSetup) {
+    return (
+      <div className={`app${darkMode ? ' dark' : ''}`}>
+        <GoalSetup onDone={() => setShowGoalSetup(false)} />
       </div>
     );
   }

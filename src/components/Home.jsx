@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { EPISODES } from '../data/listenData';
 import { getDueCount } from '../utils/srs';
+import DailyGoalRing from './DailyGoalRing';
 
 export default function Home({
   st, show, speak, CATS, LEVELS, BADGES,
@@ -75,6 +76,9 @@ export default function Home({
           <span className="due-banner-arrow">→</span>
         </div>
       )}
+
+      {/* Daily goal ring */}
+      <DailyGoalRing onClick={() => startQuiz(false)} />
 
       {/* Word of the moment */}
       {wod && (
