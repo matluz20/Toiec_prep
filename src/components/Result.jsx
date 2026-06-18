@@ -81,6 +81,12 @@ export default function Result({
       </div>
 
       <div className="result-wrap">
+        {st.streak > 1 && (
+          <div className="streak-celebrate">
+            <span className="streak-celebrate-fire">🔥</span>
+            <span className="streak-celebrate-text">{st.streak}-day streak! Keep it going</span>
+          </div>
+        )}
         <div className="r-top">
           <div className="r-score">{score}</div>
           <div className="r-lbl">correct out of {questions.length}</div>

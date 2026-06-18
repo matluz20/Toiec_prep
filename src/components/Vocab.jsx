@@ -1,4 +1,5 @@
 import React from 'react';
+import { getCategoryMastery } from '../utils/srs';
 
 export default function Vocab({ show, CATS, wpc, setCurrentCat }) {
   return (
@@ -14,6 +15,8 @@ export default function Vocab({ show, CATS, wpc, setCurrentCat }) {
         {Object.entries(CATS).map(([name, { icon, words }]) => {
           const unl = Math.min(wpc, words.length);
           const locked = words.length - unl;
+          const { mastered } = getCategoryMastery(words.slice(0, unl));
+          const pct = unl > 0 ? Math.round((mastered / unl) * 100) : 0;
           return (
             <div
               key={name}
@@ -22,7 +25,10 @@ export default function Vocab({ show, CATS, wpc, setCurrentCat }) {
             >
               <div className="cat-ic">{icon}</div>
               <div className="cat-n">{name}</div>
-              <div className="cat-c">{unl}/{words.length} words unlocked</div>
+              <div className="cat-c">{mastered}/{unl} mastered</div>
+              <div className="cat-progress">
+                <div className="cat-progress-fill" style={{ width: `${pct}%` }} />
+              </div>
               {locked > 0 && <div className="cat-lock">🔒 {locked} locked</div>}
             </div>
           );

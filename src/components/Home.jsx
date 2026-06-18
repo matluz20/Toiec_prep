@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { EPISODES } from '../data/listenData';
+import { getDueCount } from '../utils/srs';
 
 export default function Home({
   st, show, speak, CATS, LEVELS, BADGES,
@@ -11,6 +12,7 @@ export default function Home({
 }) {
   const [wodOpen, setWodOpen] = useState(false);
   const [wod, setWod] = useState(null);
+  const dueCount = getDueCount();
 
   useEffect(() => {
     const all = Object.values(CATS).flatMap((c) => c.words);
@@ -59,6 +61,20 @@ export default function Home({
           <div className="streak-pill">🔥 {st.streak}</div>
         </div>
       </div>
+
+      {/* Due today banner — top priority for retention */}
+      {dueCount > 0 && (
+        <div className="due-banner" onClick={startRevision}>
+          <div className="due-banner-left">
+            <span className="due-banner-icon">📖</span>
+            <div>
+              <div className="due-banner-title">{dueCount} word{dueCount > 1 ? 's' : ''} to review</div>
+              <div className="due-banner-sub">Review them now before you forget</div>
+            </div>
+          </div>
+          <span className="due-banner-arrow">→</span>
+        </div>
+      )}
 
       {/* Word of the moment */}
       {wod && (
@@ -181,21 +197,13 @@ export default function Home({
           <div className="sec-title" style={{ margin: 0 }}>🎧 Listen & Learn</div>
           <button className="listen-see-all" onClick={() => show('listen')}>See all →</button>
         </div>
-        <div className="listen-home-scroll">
+        <div className="mode-grid">
           {EPISODES.slice(0, 4).map((ep) => (
-            <div
-              key={ep.id}
-              className={`listen-home-card${ep.premium ? ' premium' : ''}`}
-              onClick={() => show('listen')}
-            >
-              <div className="listen-home-card-top">
-                <span className="listen-home-source">{ep.source} · {ep.duration}</span>
-                <span className="listen-home-count">{ep.words.length} words</span>
-              </div>
-              <div className="listen-home-card-title">{ep.title}</div>
-              <div className={`listen-home-play${ep.premium ? ' locked' : ''}`}>
-                {ep.premium ? '🔒 Premium' : '▶ Play'}
-              </div>
+            <div key={ep.id} className="mode-card" onClick={() => show('listen')}>
+              <div className="mode-ic ic-purple">🎧</div>
+              <div className="mode-lbl">{ep.title}</div>
+              <div className="mode-desc">{ep.source} · {ep.duration}</div>
+              <div className="mbadge mb-purple">{ep.words.length} TOEIC words</div>
             </div>
           ))}
         </div>
@@ -221,13 +229,15 @@ export default function Home({
         <div className="mode-card" onClick={startRevision} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div className="mode-ic ic-purple" style={{ margin: 0 }}>📖</div>
           <div style={{ flex: 1 }}>
-            <div className="mode-lbl">Revision</div>
-            <div className="mode-desc">Review your missed words</div>
+            <div className="mode-lbl">Smart Revision</div>
+            <div className="mode-desc">
+              {dueCount > 0
+                ? 'Words you\'re about to forget — review them now'
+                : 'Spaced repetition · come back daily'}
+            </div>
           </div>
           <div className="mbadge mb-purple">
-            {JSON.parse(localStorage.getItem('toeic_missed_words') || '[]').length > 0
-              ? `${JSON.parse(localStorage.getItem('toeic_missed_words')).length} words to review`
-              : 'No words yet'}
+            {dueCount > 0 ? `${dueCount} due today` : 'All caught up ✓'}
           </div>
         </div>
       </div>
