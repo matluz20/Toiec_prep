@@ -118,20 +118,24 @@ body.dark { background: #0e0e11; }
 /* ── MODE CARDS ────────────────────────────────────────── */
 .sec-title { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); padding: 0 1.25rem; margin-bottom: 8px; }
 .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 1.25rem 0.75rem; }
-.mode-card { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: 14px; padding: 1rem; cursor: pointer; transition: border-color .15s, transform .15s, box-shadow .15s; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; min-height: 116px; }
+.mode-card { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: 16px; padding: 1.1rem; cursor: pointer; transition: border-color .18s, transform .18s, box-shadow .18s; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; min-height: 124px; position: relative; overflow: hidden; }
+.mode-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: transparent; transition: background .18s; }
 .mode-card .mode-desc { flex: 1; }
-.mode-card:hover { border-color: var(--green); transform: translateY(-2px); box-shadow: var(--shadow-md); }
-.mode-card.hl { border-color: var(--green); }
-.mode-ic { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; font-size: 15px; }
+.mode-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.10); }
+.mode-card:active { transform: translateY(-1px) scale(0.99); }
+.mode-card.hl { border-color: var(--green-border); }
+.mode-card.hl::after { background: linear-gradient(90deg, #1D9E75, #25c89a); }
+.mode-ic { width: 44px; height: 44px; border-radius: 13px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 22px; transition: transform .18s; }
+.mode-card:hover .mode-ic { transform: scale(1.08) rotate(-4deg); }
 .ic-blue { background: var(--blue-bg); }
 .ic-teal { background: var(--green-bg); }
 .ic-amber { background: var(--amber-bg); }
 .ic-coral { background: var(--coral-bg); }
 .ic-purple { background: var(--purple-bg); }
 .ic-red { background: var(--red-bg); }
-.mode-lbl { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
-.mode-desc { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
-.mbadge { font-size: 10px; padding: 1px 6px; border-radius: 20px; display: inline-block; margin-top: 4px; }
+.mode-lbl { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+.mode-desc { font-size: 11px; color: var(--text-muted); line-height: 1.45; }
+.mbadge { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; display: inline-block; margin-top: 8px; align-self: flex-start; }
 .mb-teal { color: var(--green-dark); background: var(--green-bg); }
 .mb-amber { color: var(--amber); background: var(--amber-bg); }
 .mb-coral { color: var(--coral); background: var(--coral-bg); }
@@ -2288,3 +2292,16 @@ body.dark { background: #0e0e11; }
   text-align: left;
 }
 .gs-note strong { color: var(--text); font-weight: 700; }
+
+/* Mode card — colored top accent on hover, matching the icon */
+.mode-card:hover::after { background: var(--green); }
+.mode-card:has(.ic-blue):hover::after { background: #378ADD; }
+.mode-card:has(.ic-amber):hover::after { background: #EF9F27; }
+.mode-card:has(.ic-coral):hover::after { background: #D85A30; }
+.mode-card:has(.ic-purple):hover::after { background: #7F77DD; }
+.mode-card:has(.ic-red):hover::after { background: #E24B4A; }
+.mode-card:has(.ic-blue):hover { border-color: #85B7EB; }
+.mode-card:has(.ic-amber):hover { border-color: #FAC775; }
+.mode-card:has(.ic-coral):hover { border-color: #F0997B; }
+.mode-card:has(.ic-purple):hover { border-color: #AFA9EC; }
+.mode-card:has(.ic-red):hover { border-color: #F09595; }
