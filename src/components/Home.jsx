@@ -190,25 +190,6 @@ export default function Home({
           );
         })}
       </div>
-
-      {/* Revision */}
-      <div className="sec-title" style={{ marginTop: '1rem' }}>Revision</div>
-      <div style={{ padding: '0 1.25rem 1.5rem' }}>
-        <div className="mode-card" onClick={startRevision} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div className="mode-ic ic-purple" style={{ margin: 0 }}>📖</div>
-          <div style={{ flex: 1 }}>
-            <div className="mode-lbl">Smart Revision</div>
-            <div className="mode-desc">
-              {dueCount > 0
-                ? 'Words you\'re about to forget — review them now'
-                : 'Spaced repetition · come back daily'}
-            </div>
-          </div>
-          <div className="mbadge mb-purple">
-            {dueCount > 0 ? `${dueCount} due today` : 'All caught up ✓'}
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
