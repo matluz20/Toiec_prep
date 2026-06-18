@@ -1,0 +1,112 @@
+// TOEIC Part 5 — Incomplete Sentences
+// Real exam format: a business sentence with a blank, 4 choices,
+// testing grammar (verb forms, prepositions, conjunctions) and vocabulary in context.
+// Each question includes an explanation ("why") — this is what makes learners improve.
+
+export const PART5_QUESTIONS = [
+  {
+    sentence: 'The marketing team will _______ the new campaign results during tomorrow\'s meeting.',
+    options: ['presentation', 'present', 'presenting', 'presented'],
+    correct: 'present',
+    why: 'After the modal "will", you need the base form of the verb. This tests verb forms — a classic Part 5 point.',
+    skill: 'Verb form',
+  },
+  {
+    sentence: 'All employees must submit their expense reports _______ the end of the month.',
+    options: ['by', 'until', 'since', 'during'],
+    correct: 'by',
+    why: '"By" indicates a deadline (a point in time by which something must happen). "Until" would mean continuing up to that time.',
+    skill: 'Preposition',
+  },
+  {
+    sentence: 'The new software has significantly improved the _______ of our production line.',
+    options: ['efficient', 'efficiently', 'efficiency', 'efficiencies'],
+    correct: 'efficiency',
+    why: 'After "the" and an adjective, you need a noun. "Efficiency" is the noun form. Word-form questions are very common.',
+    skill: 'Word form',
+  },
+  {
+    sentence: '_______ the heavy rain, the outdoor event was held as scheduled.',
+    options: ['Although', 'Despite', 'However', 'Because'],
+    correct: 'Despite',
+    why: '"Despite" is followed by a noun phrase ("the heavy rain"). "Although" would need a full clause with a verb.',
+    skill: 'Conjunction',
+  },
+  {
+    sentence: 'The manager asked her assistant to _______ the documents before the client arrived.',
+    options: ['organize', 'organization', 'organized', 'organizing'],
+    correct: 'organize',
+    why: 'After "to", you need the base form of the verb (infinitive). This is a verb-form question.',
+    skill: 'Verb form',
+  },
+  {
+    sentence: 'Our company has been operating in this market _______ more than twenty years.',
+    options: ['since', 'for', 'during', 'by'],
+    correct: 'for',
+    why: '"For" is used with a duration ("more than twenty years"). "Since" would be used with a starting point in time.',
+    skill: 'Preposition',
+  },
+  {
+    sentence: 'The board approved the budget _______, with no objections from any member.',
+    options: ['unanimous', 'unanimously', 'unanimity', 'unanimousness'],
+    correct: 'unanimously',
+    why: 'You need an adverb to modify the verb "approved". "Unanimously" is the adverb form.',
+    skill: 'Word form',
+  },
+  {
+    sentence: 'Please make sure that the report is _______ reviewed before it is sent to the director.',
+    options: ['thorough', 'thoroughly', 'thoroughness', 'thoroughgoing'],
+    correct: 'thoroughly',
+    why: 'An adverb is needed to modify the verb "reviewed". "Thoroughly" is the adverb.',
+    skill: 'Word form',
+  },
+  {
+    sentence: 'The shipment will be delivered _______ you confirm your order by Friday.',
+    options: ['if', 'despite', 'unless', 'whether'],
+    correct: 'if',
+    why: '"If" introduces a condition. The sentence means delivery depends on confirmation — a conditional clause.',
+    skill: 'Conjunction',
+  },
+  {
+    sentence: 'The new policy applies to all employees _______ of their department or position.',
+    options: ['regardless', 'regard', 'regarding', 'regarded'],
+    correct: 'regardless',
+    why: '"Regardless of" is a fixed expression meaning "without considering". Learn it as a set phrase.',
+    skill: 'Vocabulary',
+  },
+  {
+    sentence: 'Sales figures this quarter were higher than _______ expected by the analysts.',
+    options: ['initial', 'initially', 'initialize', 'initiation'],
+    correct: 'initially',
+    why: 'An adverb is needed here to modify "expected". "Initially" means "at first".',
+    skill: 'Word form',
+  },
+  {
+    sentence: 'The conference room is equipped _______ the latest video conferencing technology.',
+    options: ['by', 'of', 'with', 'for'],
+    correct: 'with',
+    why: '"Equipped with" is a fixed collocation. These preposition pairings are frequently tested.',
+    skill: 'Preposition',
+  },
+  {
+    sentence: 'Employees who wish to attend the training should _______ their names on the sign-up sheet.',
+    options: ['write', 'writing', 'written', 'writes'],
+    correct: 'write',
+    why: 'After "should", use the base form of the verb. Modal verbs are always followed by the base form.',
+    skill: 'Verb form',
+  },
+  {
+    sentence: 'The customer service department handles complaints _______ and professionally.',
+    options: ['prompt', 'promptly', 'promptness', 'prompted'],
+    correct: 'promptly',
+    why: 'An adverb is needed, parallel with "professionally". "Promptly" is the adverb form.',
+    skill: 'Word form',
+  },
+  {
+    sentence: 'The merger is expected to be completed _______ the third quarter of next year.',
+    options: ['on', 'at', 'by', 'in'],
+    correct: 'by',
+    why: '"By" sets a deadline. The merger will be done no later than the third quarter.',
+    skill: 'Preposition',
+  },
+];

@@ -7,8 +7,8 @@ import { addDailyXP } from './utils/dailyGoal';
 import { supabase, signInWithGoogle, signOut, saveProgressToCloud, loadProgressFromCloud } from './supabase';
 import Home from './components/Home';
 import Onboarding from './components/Onboarding';
-import Listen from './components/Listen';
 import GoalSetup from './components/GoalSetup';
+import ExamMode from './components/ExamMode';
 import { hasCompletedSetup } from './utils/dailyGoal';
 import Vocab from './components/Vocab';
 import VocabList from './components/VocabList';
@@ -246,6 +246,22 @@ export default function App() {
     show('quiz');
   }
 
+  function startExam() {
+    show('exam');
+  }
+
+  function onExamEnd(examScore, total) {
+    const xpGained = examScore * 10;
+    addDailyXP(xpGained);
+    setSt((prev) => ({
+      ...prev,
+      xp: prev.xp + xpGained,
+      quizzes: prev.quizzes + 1,
+    }));
+    alert(`Part 5 complete! ${examScore}/${total} correct · +${xpGained} XP 🎯`);
+    show('home');
+  }
+
   function onAnswer({ correct, xpGained, word, def, fast, suddenDeath }) {
     if (word) recordReview(word, correct);
     if (correct) {
@@ -362,7 +378,7 @@ export default function App() {
     lbTab, setLbTab,
     startQuiz, startChallenge,
     user, handleGoogleLogin, handleSignOut,
-    startRevision, startCategoryQuiz, startSuddenDeath, startReversedQuiz,
+    startRevision, startCategoryQuiz, startSuddenDeath, startReversedQuiz, startExam,
     darkMode, setDarkMode,
     navItems, setNavItems, showNavEditor, setShowNavEditor,
   };
@@ -375,7 +391,6 @@ export default function App() {
     { id: 'revision', icon: '📖', label: 'Revision' },
     { id: 'death', icon: '💀', label: 'Sudden Death' },
     { id: 'reversed', icon: '🔄', label: 'Reversed' },
-    { id: 'listen', icon: '🎧', label: 'Listen' },
     { id: 'leaderboard', icon: '🏆', label: 'Rankings' },
   ];
 
@@ -387,7 +402,6 @@ export default function App() {
     revision: startRevision,
     death: startSuddenDeath,
     reversed: startReversedQuiz,
-    listen: () => show('listen'),
     leaderboard: () => show('leaderboard'),
   };
 
@@ -399,7 +413,6 @@ export default function App() {
     revision: false,
     death: false,
     reversed: false,
-    listen: screen === 'listen',
     leaderboard: screen === 'leaderboard',
   };
 
@@ -411,7 +424,7 @@ export default function App() {
       {screen === 'quiz' && <Quiz {...props} />}
       {screen === 'result' && <Result {...props} />}
       {screen === 'leaderboard' && <Leaderboard {...props} />}
-      {screen === 'listen' && <Listen show={show} isPremium={st.isPremium || false} />}
+      {screen === 'exam' && <ExamMode show={show} onExamEnd={onExamEnd} />}
 
       {screen !== 'quiz' && (
         <>

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { EPISODES } from '../data/listenData';
 import { getDueCount } from '../utils/srs';
 import DailyGoalRing from './DailyGoalRing';
 
@@ -9,7 +8,7 @@ export default function Home({
   startQuiz, startChallenge,startRevision,
   user, handleGoogleLogin, handleSignOut,startCategoryQuiz,
   startSuddenDeath,
-  startReversedQuiz,darkMode, setDarkMode,
+  startReversedQuiz,startExam,darkMode, setDarkMode,
 }) {
   const [wodOpen, setWodOpen] = useState(false);
   const [wod, setWod] = useState(null);
@@ -142,14 +141,17 @@ export default function Home({
 
       {/* Modes */}
 
-<div className="coming-soon-strip" onClick={() => alert('🔜 TOEIC Simulator coming soon !')}>
-  <span className="coming-soon-strip-icon">🏅</span>
-  <span className="coming-soon-strip-text">TOEIC Simulator — 200 questions · score 300–990</span>
-  <span className="coming-soon-strip-badge">Soon</span>
+<div className="exam-strip" onClick={startExam}>
+  <span className="exam-strip-icon">🎯</span>
+  <div className="exam-strip-text">
+    <div className="exam-strip-title">TOEIC Part 5 · Exam Practice</div>
+    <div className="exam-strip-sub">Real exam format · with explanations</div>
+  </div>
+  <span className="exam-strip-arrow">→</span>
 </div>
 
 
-<div className="sec-title">Training modes</div>
+<div className="sec-title">Learn & practice</div>
 <div className="mode-grid">
   <div className="mode-card" onClick={() => show('vocab')}>
     <div className="mode-ic ic-blue">📚</div>
@@ -162,6 +164,10 @@ export default function Home({
     <div className="mode-desc">MCQ + flashcard + fill in + write</div>
     <div className="mbadge mb-teal">+5 XP per correct</div>
   </div>
+</div>
+
+<div className="sec-title" style={{ marginTop: '0.75rem' }}>Challenge yourself</div>
+<div className="mode-grid">
   <div className="mode-card" onClick={() => startQuiz(true)}>
     <div className="mode-ic ic-amber">⏱️</div>
     <div className="mode-lbl">Speed mode</div>
@@ -176,9 +182,6 @@ export default function Home({
       {st.challengeDone ? '✓ done' : 'available'}
     </div>
   </div>
-
-
-
   <div className="mode-card" onClick={startSuddenDeath}>
     <div className="mode-ic ic-red">💀</div>
     <div className="mode-lbl">Sudden Death</div>
@@ -194,24 +197,6 @@ export default function Home({
 </div>
 
 
-
-      {/* Listen & Learn */}
-      <div className="listen-home-section">
-        <div className="listen-home-header">
-          <div className="sec-title" style={{ margin: 0 }}>🎧 Listen & Learn</div>
-          <button className="listen-see-all" onClick={() => show('listen')}>See all →</button>
-        </div>
-        <div className="mode-grid">
-          {EPISODES.slice(0, 4).map((ep) => (
-            <div key={ep.id} className="mode-card" onClick={() => show('listen')}>
-              <div className="mode-ic ic-purple">🎧</div>
-              <div className="mode-lbl">{ep.title}</div>
-              <div className="mode-desc">{ep.source} · {ep.duration}</div>
-              <div className="mbadge mb-purple">{ep.words.length} TOEIC words</div>
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* Badges */}
       <div className="sec-title" style={{ marginTop: '0.25rem' }}>My badges</div>
