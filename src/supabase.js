@@ -47,7 +47,12 @@ export async function saveProgressToCloud(userId, progress, isGuest = false) {
       fast_answers: progress.fast_answers,
       updated_at: new Date(),
     }, { onConflict: 'user_id' });
-  if (error) console.error('Save error:', error);
+  if (error) {
+    console.error('🔴 SAVE FAILED:', error.message, '| code:', error.code, '| details:', error.details, '| hint:', error.hint);
+  } else {
+    console.log('✅ Saved to cloud — XP:', progress.xp);
+  }
+  return error;
 }
 
 export async function loadProgressFromCloud(userId) {
