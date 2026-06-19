@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { getDueCount } from '../utils/srs';
 import DailyGoalRing from './DailyGoalRing';
+import {
+  BookOpen, Zap, Timer, Skull, Repeat, Target,
+  Volume2, ArrowRight,
+} from 'lucide-react';
 
 export default function Home({
   st, show, speak, CATS, LEVELS, BADGES,
@@ -116,7 +120,7 @@ export default function Home({
             <span className="wod-word">{wod.w}</span>
             <div className="wod-actions">
               <span className="wod-type">{wod.t}</span>
-              <button className="spk" onClick={(e) => { e.stopPropagation(); speak(wod.w); }}>🔊</button>
+              <button className="spk" onClick={(e) => { e.stopPropagation(); speak(wod.w); }}><Volume2 size={16} strokeWidth={2} /></button>
             </div>
           </div>
           <div className="wod-def">{wod.d}</div>
@@ -129,14 +133,14 @@ export default function Home({
       <div className="sec-title">Start learning</div>
       <div className="mode-grid">
         <div className="mode-card" onClick={() => show('vocab')}>
-          <span className="mode-watermark">📚</span>
-          <div className="mode-ic ic-blue">📚</div>
+          <span className="mode-watermark"><BookOpen size={76} strokeWidth={1.5} /></span>
+          <div className="mode-ic ic-blue"><BookOpen size={24} strokeWidth={2} /></div>
           <div className="mode-lbl">Vocabulary</div>
           <div className="mode-desc">Learn & unlock new words</div>
         </div>
         <div className="mode-card hl" onClick={() => startQuiz(false)}>
-          <span className="mode-watermark">⚡</span>
-          <div className="mode-ic ic-teal">⚡</div>
+          <span className="mode-watermark"><Zap size={76} strokeWidth={1.5} /></span>
+          <div className="mode-ic ic-teal"><Zap size={24} strokeWidth={2} /></div>
           <div className="mode-lbl">Mixed quiz {st.quizzes === 0 && <span className="mode-start-here">Start here</span>}</div>
           <div className="mode-desc">Practice all question types</div>
           <div className="mbadge mb-teal">+5 XP per correct</div>
@@ -147,12 +151,12 @@ export default function Home({
       <div className="sec-title" style={{ marginTop: '0.75rem' }}>Exam practice</div>
       <div style={{ padding: '0 1.25rem' }}>
         <div className="exam-strip" style={{ margin: 0 }} onClick={startExam}>
-          <span className="exam-strip-icon">🎯</span>
+          <span className="exam-strip-icon"><Target size={24} strokeWidth={2} /></span>
           <div className="exam-strip-text">
             <div className="exam-strip-title">TOEIC Part 5</div>
             <div className="exam-strip-sub">Real exam format · with explanations</div>
           </div>
-          <span className="exam-strip-arrow">→</span>
+          <span className="exam-strip-arrow"><ArrowRight size={20} strokeWidth={2} /></span>
         </div>
       </div>
 
@@ -160,22 +164,22 @@ export default function Home({
       <div className="sec-title" style={{ marginTop: '0.75rem' }}>Challenge yourself</div>
       <div className="mode-grid">
         <div className="mode-card" onClick={() => startQuiz(true)}>
-          <span className="mode-watermark">⏱️</span>
-          <div className="mode-ic ic-amber">⏱️</div>
+          <span className="mode-watermark"><Timer size={76} strokeWidth={1.5} /></span>
+          <div className="mode-ic ic-amber"><Timer size={24} strokeWidth={2} /></div>
           <div className="mode-lbl">Speed mode</div>
           <div className="mode-desc">Fast answers = bonus XP</div>
           <div className="mbadge mb-amber">+bonus under 10s</div>
         </div>
         <div className="mode-card" onClick={startSuddenDeath}>
-          <span className="mode-watermark">💀</span>
-          <div className="mode-ic ic-red">💀</div>
+          <span className="mode-watermark"><Skull size={76} strokeWidth={1.5} /></span>
+          <div className="mode-ic ic-red"><Skull size={24} strokeWidth={2} /></div>
           <div className="mode-lbl">Sudden Death</div>
           <div className="mode-desc">One wrong answer = game over</div>
           <div className="mbadge mb-red">How far can you go?</div>
         </div>
         <div className="mode-card" onClick={startReversedQuiz}>
-          <span className="mode-watermark">🔄</span>
-          <div className="mode-ic ic-purple">🔄</div>
+          <span className="mode-watermark"><Repeat size={76} strokeWidth={1.5} /></span>
+          <div className="mode-ic ic-purple"><Repeat size={24} strokeWidth={2} /></div>
           <div className="mode-lbl">Reversed</div>
           <div className="mode-desc">French → find the English word</div>
           <div className="mbadge mb-purple">+5 XP per correct</div>

@@ -75,7 +75,10 @@ export default function App() {
   const [missedWords, setMissedWords] = useState([]);
   const [quizTitle, setQuizTitle] = useState('');
   const [lbTab, setLbTab] = useState('xp');
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('toeic_dark') === 'true');
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('toeic_dark');
+    return saved === null ? true : saved === 'true';
+  });
   const [navItems, setNavItems] = useState(() => {
     const saved = localStorage.getItem('toeic_nav');
     return saved ? JSON.parse(saved) : ['home', 'vocab', 'quiz', 'revision', 'leaderboard'];
